@@ -33,7 +33,7 @@ model Role {
 
 model Region {
   id       String     @id @default(uuid())
-  name     String
+  name     String     @unique
   Position Position[]
 }
 
@@ -44,8 +44,8 @@ model Position {
   location             String
   function             String
   role                 String
-  jobId                String
-  desiredSkills        String[]
+  jobId                String?
+  desiredSkills        String
   desiredQualification String
   desiredExperience    String
   Region               Region?  @relation(fields: [regionId], references: [id])

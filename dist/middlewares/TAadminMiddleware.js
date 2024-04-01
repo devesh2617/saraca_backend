@@ -25,10 +25,10 @@ exports.default = (0, express_async_handler_1.default)(async (req, _, next) => {
         return next(error);
     }
     req.email = user.email;
-    if (user.Role.role === "admin" || user.Role.role === "superuser") {
+    if (user.Role.role === "TAadmin" || user.Role.role === "superuser") {
         return next();
     }
-    const error = new Error("Only admin can access this");
+    const error = new Error("Only TA admin can access this");
     error.status = 401;
     return next(error);
 });

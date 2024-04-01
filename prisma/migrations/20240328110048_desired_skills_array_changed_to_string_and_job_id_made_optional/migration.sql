@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Position" ALTER COLUMN "jobId" DROP NOT NULL,
+ALTER COLUMN "desiredSkills" SET NOT NULL,
+ALTER COLUMN "desiredSkills" SET DATA TYPE TEXT;

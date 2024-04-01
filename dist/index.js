@@ -12,13 +12,20 @@ const express_form_data_1 = __importDefault(require("express-form-data"));
 const cors_1 = __importDefault(require("cors"));
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const errorMiddleware_1 = __importDefault(require("./middlewares/errorMiddleware"));
-const AdministratorRouters_1 = __importDefault(require("./routers/AdministratorRouters"));
+const SuperUserRouter_1 = __importDefault(require("./routers/SuperUserRouter"));
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const superUserMiddleware_1 = __importDefault(require("./middlewares/superUserMiddleware"));
+const TAadminMiddleware_1 = __importDefault(require("./middlewares/TAadminMiddleware"));
+const TAadminRouter_1 = __importDefault(require("./routers/TAadminRouter"));
 const prisma = new client_1.PrismaClient();
 dotenv_1.default.config();
+// app.locals.cookieOptions = {
+//   httpOnly: true,
+//   secure: false,
+//   domain: process.env.FRONTEND_SITE_URL
+// }
 const PORT = 5000;
 const corsOptions = {
     origin: 'http://localhost:5173', // Allow requests from this origin
@@ -26,6 +33,7 @@ const corsOptions = {
 };
 const styledText = '\x1b[33;4m'; // 33 is for yellow color, 4 is for underline
 const resetFormatting = '\x1b[0m';
+// app.use(cookieParser())
 app.use(express_form_data_1.default.parse());
 app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.static(path_1.default.join(__dirname, '../public')));
@@ -36,13 +44,19 @@ app.use(errorMiddleware_1.default);
 app.post("/login", (0, express_async_handler_1.default)(async (req, res, next) => {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({
-        where: { email },
+        where: { email: email.toLowerCase() },
         include: { Role: true }
     });
     if (!user) {
         const error = new Error();
         error.status = 401;
         error.message = "No user found with the email";
+        return next(error);
+    }
+    if (user.Role.role !== 'superuser' && user.Role.role !== "admin" && user.Role.role !== "TAadmin") {
+        const error = new Error();
+        error.status = 401;
+        error.message = "Unauthorised";
         return next(error);
     }
     const result = await bcrypt_1.default.compare(password, user.password);
@@ -59,10 +73,34 @@ app.post("/login", (0, express_async_handler_1.default)(async (req, res, next) =
     const token = await jsonwebtoken_1.default.sign(payload, process.env.SECRET_KEY, { expiresIn: expiresIn });
     res.status(200).json({
         message: 'Logged in successfully',
-        token: token
+        role: user.Role.role,
+        token
     });
 }));
-app.use('/superuser', superUserMiddleware_1.default, AdministratorRouters_1.default);
+app.get('/check_user', (0, express_async_handler_1.default)(async (req, res, next) => {
+    const token = req?.headers?.authorization?.split(" ")[1];
+    if (!token) {
+        const error = new Error("unauthorized");
+        error.status = 401;
+        return next(error);
+    }
+    const decoded = await jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+    const user = await prisma.user.findUnique({
+        where: { id: decoded.id },
+        include: { Role: true }
+    });
+    if (!user) {
+        const error = new Error("User not found");
+        error.status = 401;
+        return next(error);
+    }
+    res.status(200).json({
+        valid: true,
+        role: user.Role.role
+    });
+}));
+app.use('/superuser', superUserMiddleware_1.default, SuperUserRouter_1.default);
+app.use('/TAadmin', TAadminMiddleware_1.default, TAadminRouter_1.default);
 app.post('/contact_us', (0, express_async_handler_1.default)(async (req, res, next) => {
     const { name, email, country_code, organisation, mobile_no, country, industry, message } = req.body;
     const transporter = nodemailer_1.default.createTransport({

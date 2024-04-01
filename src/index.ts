@@ -7,14 +7,21 @@ import expressFormData from 'express-form-data';
 import cors from 'cors'
 import asyncHandler from 'express-async-handler';
 import errorMiddleware from './middlewares/errorMiddleware';
-import AdministratorRouter from './routers/AdministratorRouters';
+import AdministratorRouter from './routers/SuperUserRouter';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 import superUserMiddleware from './middlewares/superUserMiddleware';
-const prisma = new PrismaClient()
+import TAadminMiddleware from './middlewares/TAadminMiddleware';
+import TAadminRouter from "./routers/TAadminRouter";
+const prisma = new PrismaClient();
 
 dotenv.config()
+// app.locals.cookieOptions = {
+//   httpOnly: true,
+//   secure: false,
+//   domain: process.env.FRONTEND_SITE_URL
+// }
 const PORT = 5000;
 const corsOptions = {
   origin: 'http://localhost:5173', // Allow requests from this origin
@@ -22,52 +29,88 @@ const corsOptions = {
 };
 const styledText = '\x1b[33;4m'; // 33 is for yellow color, 4 is for underline
 const resetFormatting = '\x1b[0m';
+// app.use(cookieParser())
 app.use(expressFormData.parse())
 app.use(cors(corsOptions))
-app.use(express.static(path.join(__dirname,'../public')))
+app.use(express.static(path.join(__dirname, '../public')))
 app.listen(PORT, () => {
   console.log(`${styledText}Server is running ${PORT}${resetFormatting}`);
 })
 
 app.use(errorMiddleware)
-app.post("/login", asyncHandler(async(req:any, res:Response, next:NextFunction)=> {
 
-  const {email, password} = req.body;
+app.post("/login", asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+
+  const { email, password } = req.body;
   const user = await prisma.user.findUnique({
-    where:{email},
-    include: {Role:true}
+    where: { email:email.toLowerCase() },
+    include: { Role: true }
   })
-  
-  if(!user) {
-    const error:any = new Error()
+
+  if (!user) {
+    const error: any = new Error()
     error.status = 401
     error.message = "No user found with the email"
     return next(error)
   }
+  if (user.Role.role !== 'superuser' && user.Role.role  !== "admin" && user.Role.role !== "TAadmin") {
+    const error: any = new Error()
+    error.status = 401
+    error.message = "Unauthorised"
+    return next(error)
+  }
   const result = await bcrypt.compare(password, user.password)
-  if(!result){
-    const error:any = new Error()
+  if (!result) {
+    const error: any = new Error()
     error.status = 401
     error.message = "Password is wrong"
     return next(error)
   }
-  
+
   const payload = {
-    id:user.id
+    id: user.id
   }
   const expiresIn = '24h'
-  const token = await jwt.sign(payload, process.env.SECRET_KEY, {expiresIn:expiresIn})
+  const token = await jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: expiresIn })
   res.status(200).json({
-    message:'Logged in successfully',
-    token: token
+    message: 'Logged in successfully',
+    role: user.Role.role,
+    token
   })
 }))
+
+app.get('/check_user', asyncHandler(async (req: any, res: Response, next:NextFunction) => {
+   
+    const token = req?.headers?.authorization?.split(" ")[1]
+        if(!token){
+            const error:any = new Error("unauthorized")
+            error.status = 401
+            return next(error)
+        }
+        const decoded = await jwt.verify(token, process.env.SECRET_KEY)
+        const user = await prisma.user.findUnique({
+            where: { id: decoded.id },
+            include:{Role:true}
+        })
+        if (!user) {
+            const error: any = new Error("User not found")
+            error.status = 401
+            return next(error)
+        }
+        res.status(200).json({
+          valid: true,
+          role:user.Role.role
+        })
+        
+}))
+
 app.use('/superuser', superUserMiddleware, AdministratorRouter)
+app.use('/TAadmin', TAadminMiddleware, TAadminRouter)
 app.post('/contact_us', asyncHandler(
-  async(req:Request, res:Response, next:NextFunction)=>{
-    const {name, email, country_code, organisation, mobile_no, country, industry, message} = req.body
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { name, email, country_code, organisation, mobile_no, country, industry, message } = req.body
     const transporter = nodemailer.createTransport({
-      service:"gmail",
+      service: "gmail",
       host: "smtp.gmail.com",
       port: 587,
       secure: false, // Use `true` for port 465, `false` for all other ports
@@ -76,11 +119,11 @@ app.post('/contact_us', asyncHandler(
         pass: process.env.PASS,
       },
     });
-      transporter.sendMail({
-        from: `"SARACA Website" <${process.env.USER_EMAIL}>`, // sender address
-        to: `${process.env.CONTACT_SARACA_EMAIL} ${email}`, // list of receivers
-        subject: "Contact Us mail from SARACA Website", // Subject line
-        html: `<!DOCTYPE html>
+    transporter.sendMail({
+      from: `"SARACA Website" <${process.env.USER_EMAIL}>`, // sender address
+      to: `${process.env.CONTACT_SARACA_EMAIL} ${email}`, // list of receivers
+      subject: "Contact Us mail from SARACA Website", // Subject line
+      html: `<!DOCTYPE html>
         <html lang="en">
         <head>
           <meta charset="UTF-8">
@@ -149,17 +192,17 @@ app.post('/contact_us', asyncHandler(
         </body>
         </html>
         `, // html body
-      },(err:any, info:any) => {
-        if (err) {
-            next(err)
-        }
-        return res.status(200).json({
-          message: "Email Sent Successfully",
-          messageId: info.messageId
-        })
-       
+    }, (err: any, info: any) => {
+      if (err) {
+        next(err)
+      }
+      return res.status(200).json({
+        message: "Email Sent Successfully",
+        messageId: info.messageId
+      })
+
     });
-  
-}
+
+  }
 ))
 

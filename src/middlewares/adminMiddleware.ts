@@ -3,9 +3,15 @@ import { PrismaClient } from '@prisma/client';
 import asyncHandler from 'express-async-handler';
 import jwt from 'jsonwebtoken'
 const prisma = new PrismaClient()
+
 export default asyncHandler(
     async (req: any, _, next: NextFunction) => {
-        const token = req.headers.authorization.split(" ")[1]
+        const token = req?.headers?.authorization?.split(" ")[1]
+        if(!token){
+            const error:any = new Error("unauthorized")
+            error.status = 401
+            return next(error)
+        }
         const decoded = await jwt.verify(token, process.env.SECRET_KEY)
         const user = await prisma.user.findUnique({
             where: { id: decoded.id },
@@ -23,6 +29,5 @@ export default asyncHandler(
         const error: any = new Error("Only admin can access this")
         error.status = 401
         return next(error)
-
     }
 )
