@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "dev": "tsc --watch & nodemon dist/index.js"
+    "dev": "nodemon dist/index.js"
   },
   "keywords": [],
   "author": "",
