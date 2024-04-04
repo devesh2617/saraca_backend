@@ -53,3 +53,43 @@ model Position {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 }
+
+model WhitePaper {
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  description String
+  img         String
+  date        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Blog {
+  id        String   @id @default(uuid())
+  title     String
+  img       String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Webinar {
+  id        String   @id @default(uuid())
+  title     String
+  img       String
+  link      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model News {
+  id          String   @id @default(uuid())
+  img         String
+  title       String
+  description String
+  date        String
+  link        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

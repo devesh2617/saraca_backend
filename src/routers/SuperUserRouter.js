@@ -1,0 +1,10 @@
+"use strict";
+exports.__esModule = true;
+var express_1 = require("express");
+var SuperUserControllers_1 = require("../controlllers/SuperUserControllers");
+var Router = express_1["default"].Router();
+Router.post('/create_user', SuperUserControllers_1.createUser);
+Router.post('/create_role', SuperUserControllers_1.createRole);
+Router.post('/delete_role', SuperUserControllers_1.deleteRole);
+Router.post('/delete_user', SuperUserControllers_1.deleteUser);
+exports["default"] = Router;
