@@ -13,12 +13,14 @@ const cors_1 = __importDefault(require("cors"));
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const errorMiddleware_1 = __importDefault(require("./middlewares/errorMiddleware"));
 const SuperUserRouter_1 = __importDefault(require("./routers/SuperUserRouter"));
+const AdminRouter_1 = __importDefault(require("./routers/AdminRouter"));
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const superUserMiddleware_1 = __importDefault(require("./middlewares/superUserMiddleware"));
 const TAadminMiddleware_1 = __importDefault(require("./middlewares/TAadminMiddleware"));
 const TAadminRouter_1 = __importDefault(require("./routers/TAadminRouter"));
+const adminMiddleware_1 = __importDefault(require("./middlewares/adminMiddleware"));
 const prisma = new client_1.PrismaClient();
 dotenv_1.default.config();
 // app.locals.cookieOptions = {
@@ -34,7 +36,11 @@ const corsOptions = {
 const styledText = '\x1b[33;4m'; // 33 is for yellow color, 4 is for underline
 const resetFormatting = '\x1b[0m';
 // app.use(cookieParser())
-app.use(express_form_data_1.default.parse());
+app.use(express_form_data_1.default.parse({
+    maxFileSize: 10 * 1024 * 1024, // 10MB limit
+    autoClean: true // Automatically clean uploaded files
+}));
+app.use(express_form_data_1.default.union());
 app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.static(path_1.default.join(__dirname, '../public')));
 app.listen(PORT, () => {
@@ -101,6 +107,7 @@ app.get('/check_user', (0, express_async_handler_1.default)(async (req, res, nex
 }));
 app.use('/superuser', superUserMiddleware_1.default, SuperUserRouter_1.default);
 app.use('/TAadmin', TAadminMiddleware_1.default, TAadminRouter_1.default);
+app.use('/admin', adminMiddleware_1.default, AdminRouter_1.default);
 app.post('/contact_us', (0, express_async_handler_1.default)(async (req, res, next) => {
     const { name, email, country_code, organisation, mobile_no, country, industry, message } = req.body;
     const transporter = nodemailer_1.default.createTransport({

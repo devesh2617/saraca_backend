@@ -2,18 +2,20 @@ import express, { NextFunction, Request, Response } from 'express'
 import nodemailer from 'nodemailer'
 const app = express();
 import path from 'path';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 import expressFormData from 'express-form-data';
-import cors from 'cors'
+import cors from 'cors';
 import asyncHandler from 'express-async-handler';
 import errorMiddleware from './middlewares/errorMiddleware';
-import AdministratorRouter from './routers/SuperUserRouter';
+import SuperUserRouter from './routers/SuperUserRouter';
+import AdminRouter from './routers/AdminRouter'
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import superUserMiddleware from './middlewares/superUserMiddleware';
 import TAadminMiddleware from './middlewares/TAadminMiddleware';
 import TAadminRouter from "./routers/TAadminRouter";
+import adminMiddleware from './middlewares/adminMiddleware';
 const prisma = new PrismaClient();
 
 dotenv.config()
@@ -30,7 +32,12 @@ const corsOptions = {
 const styledText = '\x1b[33;4m'; // 33 is for yellow color, 4 is for underline
 const resetFormatting = '\x1b[0m';
 // app.use(cookieParser())
-app.use(expressFormData.parse())
+app.use(expressFormData.parse({
+  maxFileSize: 10 * 1024 * 1024, // 10MB limit
+  autoClean: true // Automatically clean uploaded files
+}))
+app.use(expressFormData.union())
+
 app.use(cors(corsOptions))
 app.use(express.static(path.join(__dirname, '../public')))
 app.listen(PORT, () => {
@@ -104,8 +111,9 @@ app.get('/check_user', asyncHandler(async (req: any, res: Response, next:NextFun
         
 }))
 
-app.use('/superuser', superUserMiddleware, AdministratorRouter)
+app.use('/superuser', superUserMiddleware, SuperUserRouter)
 app.use('/TAadmin', TAadminMiddleware, TAadminRouter)
+app.use('/admin', adminMiddleware, AdminRouter)
 app.post('/contact_us', asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, country_code, organisation, mobile_no, country, industry, message } = req.body
