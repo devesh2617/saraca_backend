@@ -12,4 +12,8 @@ Router.post('/create_webinar', AdminControllers_1.addWebinar);
 Router.post('/create_blog', AdminControllers_1.addBlog);
 Router.post('/create_case_study', AdminControllers_1.addCaseStudy);
 Router.post('/edit_white_paper/:id', AdminControllers_1.editWhitePaper);
+Router.post('/edit_case_study/:id', AdminControllers_1.editCaseStudy);
+Router.post('/edit_news/:id', AdminControllers_1.editNews);
+Router.post('/edit_blog/:id', AdminControllers_1.editBlog);
+Router.post('/edit_webinar/:id', AdminControllers_1.editWebinar);
 exports.default = Router;

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editWhitePaper = exports.addCaseStudy = exports.addBlog = exports.addWebinar = exports.addNews = exports.addWhitePaper = void 0;
+exports.editCaseStudy = exports.editNews = exports.editWebinar = exports.editBlog = exports.editWhitePaper = exports.addCaseStudy = exports.addBlog = exports.addWebinar = exports.addNews = exports.addWhitePaper = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const fs_1 = __importDefault(require("fs"));
@@ -249,3 +249,217 @@ const editWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
     }
 });
 exports.editWhitePaper = editWhitePaper;
+const editBlog = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { title, content } = req.body;
+    const { id } = req.params;
+    const blogFound = await prisma.blog.findFirst({
+        where: { id }
+    });
+    if (!blogFound) {
+        const error = new Error("Blog post doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    const file = req.files?.img;
+    try {
+        if (file) {
+            const filename = Date.now() + "__" + file.name;
+            const filepath = path_1.default.join(__dirname, `../../public/images/blogs/${filename}`);
+            await fs_1.default.promises.copyFile(file.path, filepath);
+            if (blogFound.img) {
+                fs_1.default.rmSync(path_1.default.join(__dirname, `../../public/images/blogs/${blogFound.img.split("/")[blogFound.img.split("/").length - 1]}`));
+            }
+            await prisma.blog.update({
+                where: { id },
+                data: {
+                    img: `${process.env.BACKEND_SITE_URL}/images/blogs/${filename}`,
+                    title,
+                    content
+                }
+            });
+        }
+        else {
+            // If no new image is provided, just update the title and content
+            await prisma.blog.update({
+                where: { id },
+                data: {
+                    title,
+                    content
+                }
+            });
+        }
+        res.status(200).json({
+            message: "Blog post edited successfully"
+        });
+    }
+    catch (error) {
+        console.error(error);
+        const err = new Error('Error processing request');
+        err.status = 500;
+        return next(err);
+    }
+});
+exports.editBlog = editBlog;
+const editWebinar = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { title, link } = req.body;
+    const { id } = req.params;
+    const webinarFound = await prisma.webinar.findFirst({
+        where: { id }
+    });
+    if (!webinarFound) {
+        const error = new Error("Webinar doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    const file = req.files?.img;
+    try {
+        if (file) {
+            const filename = Date.now() + "__" + file.name;
+            const filepath = path_1.default.join(__dirname, `../../public/images/webinars/${filename}`);
+            await fs_1.default.promises.copyFile(file.path, filepath);
+            if (webinarFound.img) {
+                fs_1.default.rmSync(path_1.default.join(__dirname, `../../public/images/webinars/${webinarFound.img.split("/")[webinarFound.img.split("/").length - 1]}`));
+            }
+            await prisma.webinar.update({
+                where: { id },
+                data: {
+                    img: `${process.env.BACKEND_SITE_URL}/images/webinars/${filename}`,
+                    title,
+                    link
+                }
+            });
+        }
+        else {
+            // If no new image is provided, just update the title and link
+            await prisma.webinar.update({
+                where: { id },
+                data: {
+                    title,
+                    link
+                }
+            });
+        }
+        res.status(200).json({
+            message: "Webinar edited successfully"
+        });
+    }
+    catch (error) {
+        console.error(error);
+        const err = new Error('Error processing request');
+        err.status = 500;
+        return next(err);
+    }
+});
+exports.editWebinar = editWebinar;
+const editNews = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { title, description, date, link } = req.body;
+    const { id } = req.params;
+    const newsItemFound = await prisma.news.findFirst({
+        where: { id }
+    });
+    if (!newsItemFound) {
+        const error = new Error("News item doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    const file = req.files?.img;
+    try {
+        if (file) {
+            const filename = Date.now() + "__" + file.name;
+            const filepath = path_1.default.join(__dirname, `../../public/images/news/${filename}`);
+            await fs_1.default.promises.copyFile(file.path, filepath);
+            if (newsItemFound.img) {
+                fs_1.default.rmSync(path_1.default.join(__dirname, `../../public/images/news/${newsItemFound.img.split("/")[newsItemFound.img.split("/").length - 1]}`));
+            }
+            await prisma.news.update({
+                where: { id },
+                data: {
+                    img: `${process.env.BACKEND_SITE_URL}/images/news/${filename}`,
+                    title,
+                    description,
+                    date,
+                    link
+                }
+            });
+        }
+        else {
+            // If no new image is provided, just update the title, description, date, and link
+            await prisma.news.update({
+                where: { id },
+                data: {
+                    title,
+                    description,
+                    date,
+                    link
+                }
+            });
+        }
+        res.status(200).json({
+            message: "News item edited successfully"
+        });
+    }
+    catch (error) {
+        console.error(error);
+        const err = new Error('Error processing request');
+        err.status = 500;
+        return next(err);
+    }
+});
+exports.editNews = editNews;
+const editCaseStudy = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { title, project_scope, project_deliverables, customer, key_tools } = req.body;
+    const { id } = req.params;
+    const caseStudyFound = await prisma.caseStudy.findFirst({
+        where: { id }
+    });
+    if (!caseStudyFound) {
+        const error = new Error("Case study doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    const file = req.files?.img;
+    try {
+        if (file) {
+            const filename = Date.now() + "__" + file.name;
+            const filepath = path_1.default.join(__dirname, `../../public/images/case-studies/${filename}`);
+            await fs_1.default.promises.copyFile(file.path, filepath);
+            if (caseStudyFound.img) {
+                fs_1.default.rmSync(path_1.default.join(__dirname, `../../public/images/case-studies/${caseStudyFound.img.split("/")[caseStudyFound.img.split("/").length - 1]}`));
+            }
+            await prisma.caseStudy.update({
+                where: { id },
+                data: {
+                    img: `${process.env.BACKEND_SITE_URL}/images/case-studies/${filename}`,
+                    title,
+                    project_scope,
+                    project_deliverables,
+                    customer,
+                    key_tools
+                }
+            });
+        }
+        else {
+            // If no new image is provided, just update the other fields
+            await prisma.caseStudy.update({
+                where: { id },
+                data: {
+                    title,
+                    project_scope,
+                    project_deliverables,
+                    customer,
+                    key_tools
+                }
+            });
+        }
+        res.status(200).json({
+            message: "Case study edited successfully"
+        });
+    }
+    catch (error) {
+        console.error(error);
+        const err = new Error('Error processing request');
+        err.status = 500;
+        return next(err);
+    }
+});
+exports.editCaseStudy = editCaseStudy;

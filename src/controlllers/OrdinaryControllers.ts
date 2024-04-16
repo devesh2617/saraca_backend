@@ -61,7 +61,7 @@ const getRegions = asyncHandler(async (req: any, res: Response, next: NextFuncti
     })
  })
 
- const getPosition = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+ const getPositionbyId = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
    const {id} = req.params
     const position = await prisma.position.findFirst({
         where:{id}
@@ -77,7 +77,7 @@ const getRegions = asyncHandler(async (req: any, res: Response, next: NextFuncti
     })
  })
 
- const getWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+ const getWhitePaperbyId = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
    const {id} = req.params
     const wp = await prisma.whitePaper.findFirst({
         where:{id}
@@ -93,4 +93,68 @@ const getRegions = asyncHandler(async (req: any, res: Response, next: NextFuncti
     })
  })
 
-export { getWhitePapers, getBlogs, getNews, getWebinars, getCaseStudies, getRegions, getPositions, getPosition, getWhitePaper }
+ const getBlogbyId = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const {id} = req.params
+     const blog = await prisma.blog.findFirst({
+         where:{id}
+     })
+     if(!blog){
+         const error:any = new Error("Blog don't exist")
+         error.status = 404
+         return next(error)
+     }
+     res.status(200).json({
+        message: "Blog fetched successfully",
+        blog: blog
+     })
+  })
+
+  const getWebinarbyId = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const {id} = req.params
+     const webinar = await prisma.webinar.findFirst({
+         where:{id}
+     })
+     if(!webinar){
+         const error:any = new Error("Webinar don't exist")
+         error.status = 404
+         return next(error)
+     }
+     res.status(200).json({
+        message: "Webinar fetched successfully",
+        webinar: webinar
+     })
+  })
+
+  const getNewsbyId = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const {id} = req.params
+     const news = await prisma.news.findFirst({
+         where:{id}
+     })
+     if(!news){
+         const error:any = new Error("News don't exist")
+         error.status = 404
+         return next(error)
+     }
+     res.status(200).json({
+        message: "News fetched successfully",
+        news: news
+     })
+  })
+
+  const getCaseStudybyId = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const {id} = req.params
+     const cs = await prisma.caseStudy.findFirst({
+         where:{id}
+     })
+     if(!cs){
+         const error:any = new Error("Case Study don't exist")
+         error.status = 404
+         return next(error)
+     }
+     res.status(200).json({
+        message: "Case Study fetched successfully",
+        caseStudy: cs
+     })
+  })
+
+export { getWhitePapers, getBlogs, getNews, getWebinars, getCaseStudies, getRegions, getPositions, getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId }

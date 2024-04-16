@@ -275,5 +275,242 @@ const editWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFu
     }
 });
 
+const editBlog = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const { title, content } = req.body;
+    const { id } = req.params;
 
-export { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper }
+    const blogFound = await prisma.blog.findFirst({
+        where: { id }
+    });
+
+    if (!blogFound) {
+        const error: any = new Error("Blog post doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+
+    const file = req.files?.img;
+
+    try {
+        if (file) {
+            const filename = Date.now() + "__" + file.name;
+            const filepath = path.join(__dirname, `../../public/images/blogs/${filename}`);
+
+            await fs.promises.copyFile(file.path, filepath);
+
+            if (blogFound.img) {
+                fs.rmSync(path.join(__dirname, `../../public/images/blogs/${blogFound.img.split("/")[blogFound.img.split("/").length - 1]}`));
+            }
+
+            await prisma.blog.update({
+                where: { id },
+                data: {
+                    img: `${process.env.BACKEND_SITE_URL}/images/blogs/${filename}`,
+                    title,
+                    content
+                }
+            });
+        } else {
+            // If no new image is provided, just update the title and content
+            await prisma.blog.update({
+                where: { id },
+                data: {
+                    title,
+                    content
+                }
+            });
+        }
+
+        res.status(200).json({
+            message: "Blog post edited successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        const err: any = new Error('Error processing request');
+        err.status = 500;
+        return next(err);
+    }
+});
+
+const editWebinar = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const { title, link } = req.body;
+    const { id } = req.params;
+
+    const webinarFound = await prisma.webinar.findFirst({
+        where: { id }
+    });
+
+    if (!webinarFound) {
+        const error: any = new Error("Webinar doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+
+    const file = req.files?.img;
+
+    try {
+        if (file) {
+            const filename = Date.now() + "__" + file.name;
+            const filepath = path.join(__dirname, `../../public/images/webinars/${filename}`);
+
+            await fs.promises.copyFile(file.path, filepath);
+
+            if (webinarFound.img) {
+                fs.rmSync(path.join(__dirname, `../../public/images/webinars/${webinarFound.img.split("/")[webinarFound.img.split("/").length - 1]}`));
+            }
+
+            await prisma.webinar.update({
+                where: { id },
+                data: {
+                    img: `${process.env.BACKEND_SITE_URL}/images/webinars/${filename}`,
+                    title,
+                    link
+                }
+            });
+        } else {
+            // If no new image is provided, just update the title and link
+            await prisma.webinar.update({
+                where: { id },
+                data: {
+                    title,
+                    link
+                }
+            });
+        }
+
+        res.status(200).json({
+            message: "Webinar edited successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        const err: any = new Error('Error processing request');
+        err.status = 500;
+        return next(err);
+    }
+});
+
+const editNews = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const { title, description, date, link } = req.body;
+    const { id } = req.params;
+
+    const newsItemFound = await prisma.news.findFirst({
+        where: { id }
+    });
+
+    if (!newsItemFound) {
+        const error: any = new Error("News item doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+
+    const file = req.files?.img;
+
+    try {
+        if (file) {
+            const filename = Date.now() + "__" + file.name;
+            const filepath = path.join(__dirname, `../../public/images/news/${filename}`);
+
+            await fs.promises.copyFile(file.path, filepath);
+
+            if (newsItemFound.img) {
+                fs.rmSync(path.join(__dirname, `../../public/images/news/${newsItemFound.img.split("/")[newsItemFound.img.split("/").length - 1]}`));
+            }
+
+            await prisma.news.update({
+                where: { id },
+                data: {
+                    img: `${process.env.BACKEND_SITE_URL}/images/news/${filename}`,
+                    title,
+                    description,
+                    date,
+                    link
+                }
+            });
+        } else {
+            // If no new image is provided, just update the title, description, date, and link
+            await prisma.news.update({
+                where: { id },
+                data: {
+                    title,
+                    description,
+                    date,
+                    link
+                }
+            });
+        }
+
+        res.status(200).json({
+            message: "News item edited successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        const err: any = new Error('Error processing request');
+        err.status = 500;
+        return next(err);
+    }
+});
+
+const editCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const { title, project_scope, project_deliverables, customer, key_tools } = req.body;
+    const { id } = req.params;
+
+    const caseStudyFound = await prisma.caseStudy.findFirst({
+        where: { id }
+    });
+
+    if (!caseStudyFound) {
+        const error: any = new Error("Case study doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+
+    const file = req.files?.img;
+
+    try {
+        if (file) {
+            const filename = Date.now() + "__" + file.name;
+            const filepath = path.join(__dirname, `../../public/images/case-studies/${filename}`);
+
+            await fs.promises.copyFile(file.path, filepath);
+
+            if (caseStudyFound.img) {
+                fs.rmSync(path.join(__dirname, `../../public/images/case-studies/${caseStudyFound.img.split("/")[caseStudyFound.img.split("/").length - 1]}`));
+            }
+
+            await prisma.caseStudy.update({
+                where: { id },
+                data: {
+                    img: `${process.env.BACKEND_SITE_URL}/images/case-studies/${filename}`,
+                    title,
+                    project_scope,
+                    project_deliverables,
+                    customer,
+                    key_tools
+                }
+            });
+        } else {
+            // If no new image is provided, just update the other fields
+            await prisma.caseStudy.update({
+                where: { id },
+                data: {
+                    title,
+                    project_scope,
+                    project_deliverables,
+                    customer,
+                    key_tools
+                }
+            });
+        }
+
+        res.status(200).json({
+            message: "Case study edited successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        const err: any = new Error('Error processing request');
+        err.status = 500;
+        return next(err);
+    }
+});
+
+export { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper, editBlog, editWebinar, editNews, editCaseStudy }
