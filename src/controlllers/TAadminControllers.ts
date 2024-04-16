@@ -24,13 +24,7 @@ const addRegion = asyncHandler(async (req: any, res: Response, next: NextFunctio
    })
 })
 
-const getRegions = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
-   const regions = await prisma.region.findMany({include:{Position:false}})
-   res.status(201).json({
-      message: "Region added successfully",
-      regions: regions
-   })
-})
+
 
 const addPosition = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
    const { title, description, location, functional, role, desiredSkills, desiredQualification, desiredExperience, region } = req.body
@@ -40,8 +34,12 @@ const addPosition = asyncHandler(async (req: any, res: Response, next: NextFunct
       error.status = 404
       return next(error)
    }
-   const positionCount = await prisma.position.count()
-   console.log(typeof positionCount)
+   let positionCount:any = await prisma.position.count()
+   positionCount = positionCount+1
+   positionCount = positionCount.toString()
+   let jobNo = positionCount.padStart(5, '0')
+   const date = new Date()
+   let jobId = 'SS'+ date.getFullYear() +jobNo
    await prisma.position.create({
       data: {
          title,
@@ -50,6 +48,7 @@ const addPosition = asyncHandler(async (req: any, res: Response, next: NextFunct
          function: functional,
          role, 
          desiredSkills,
+         jobId,
          desiredQualification,
          desiredExperience,
          Region: { connect: { id:foundRegion.id} }
@@ -60,4 +59,23 @@ const addPosition = asyncHandler(async (req: any, res: Response, next: NextFunct
    })
 })
 
-export { addRegion, addPosition, getRegions }
+const deletePosition = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+   const { id } = req.params
+   
+   const foundPosition = await prisma.position.findUnique({ where: { id:id } })
+   if (!foundPosition) {
+      const error: any = new Error("This position doesn't exist")
+      error.status = 404
+      return next(error)
+   }
+
+   await prisma.position.delete({
+      where:{id}
+   })
+   
+   res.status(201).json({
+      message:"Position deleted successfully"
+   })
+})
+
+export { addRegion, addPosition, deletePosition }

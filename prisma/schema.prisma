@@ -32,9 +32,11 @@ model Role {
 }
 
 model Region {
-  id       String     @id @default(uuid())
-  name     String     @unique
-  Position Position[]
+  id        String     @id @default(uuid())
+  name      String     @unique
+  Position  Position[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model Position {
@@ -55,41 +57,54 @@ model Position {
 }
 
 model WhitePaper {
-  id           String   @id @default(uuid())
-  title        String   @unique
-  content      String
-  description  String
-  img          String
-  date         String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(uuid())
+  title       String   @unique
+  content     String
+  description String
+  img         String
+  pdf         String
+  date        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Blog {
-  id           String   @id @default(uuid())
-  title        String   @unique
-  img          String
-  content      String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id        String   @id @default(uuid())
+  title     String   @unique
+  img       String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Webinar {
-  id           String   @id @default(uuid())
-  title        String   @unique
-  img          String
-  link         String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id        String   @id @default(uuid())
+  title     String   @unique
+  img       String
+  link      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model News {
-  id           String   @id @default(uuid())
-  img          String
-  title        String   @unique
-  description  String
-  date         String
-  link         String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(uuid())
+  img         String
+  title       String   @unique
+  description String
+  date        String
+  link        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CaseStudy {
+  id                   String   @id @default(uuid())
+  img                  String
+  title                String   @unique
+  project_scope        String
+  project_deliverables String
+  customer             String
+  key_tools            String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }

@@ -21,6 +21,7 @@ const superUserMiddleware_1 = __importDefault(require("./middlewares/superUserMi
 const TAadminMiddleware_1 = __importDefault(require("./middlewares/TAadminMiddleware"));
 const TAadminRouter_1 = __importDefault(require("./routers/TAadminRouter"));
 const adminMiddleware_1 = __importDefault(require("./middlewares/adminMiddleware"));
+const OrdinaryRouter_1 = __importDefault(require("./routers/OrdinaryRouter"));
 const prisma = new client_1.PrismaClient();
 dotenv_1.default.config();
 // app.locals.cookieOptions = {
@@ -108,6 +109,7 @@ app.get('/check_user', (0, express_async_handler_1.default)(async (req, res, nex
 app.use('/superuser', superUserMiddleware_1.default, SuperUserRouter_1.default);
 app.use('/TAadmin', TAadminMiddleware_1.default, TAadminRouter_1.default);
 app.use('/admin', adminMiddleware_1.default, AdminRouter_1.default);
+app.use('/api', OrdinaryRouter_1.default);
 app.post('/contact_us', (0, express_async_handler_1.default)(async (req, res, next) => {
     const { name, email, country_code, organisation, mobile_no, country, industry, message } = req.body;
     const transporter = nodemailer_1.default.createTransport({

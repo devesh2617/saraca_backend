@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = exports.addBlog = exports.addWebinar = exports.addNews = exports.addWhitePaper = void 0;
+exports.editWhitePaper = exports.addCaseStudy = exports.addBlog = exports.addWebinar = exports.addNews = exports.addWhitePaper = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const fs_1 = __importDefault(require("fs"));
@@ -20,21 +20,67 @@ const addWhitePaper = (0, express_async_handler_1.default)(async (req, res, next
         return next(error);
     }
     const file = req.files.img;
+    const pdfFile = req.files.pdf;
+    const pdffilename = Date.now() + "__" + pdfFile.name;
+    const pdffilepath = path_1.default.join(__dirname, `../../public/images/whitePapers/pdf/${pdffilename}`);
     const filename = Date.now() + "__" + file.name;
-    const filepath = path_1.default.join(__dirname, `../../public/images/whitePapers/${filename}`);
+    const filepath = path_1.default.join(__dirname, `../../public/images/whitePapers/img/${filename}`);
+    fs_1.default.promises.copyFile(file.path, filepath)
+        .then(() => {
+        fs_1.default.promises.copyFile(pdfFile.path, pdffilepath).then(async () => {
+            await prisma.whitePaper.create({
+                data: {
+                    title,
+                    content,
+                    description,
+                    date,
+                    img: `${process.env.BACKEND_SITE_URL}/images/whitePapers/img/${filename}`,
+                    pdf: `${process.env.BACKEND_SITE_URL}/images/whitePapers/pdf/${pdffilename}`
+                }
+            });
+            res.status(201).json({
+                message: "WhitePaper created successfully"
+            });
+        }).catch(() => {
+            const error = new Error('Error uploading pdf file');
+            error.status = 500;
+            return next(error);
+        });
+    })
+        .catch(() => {
+        const error = new Error('Error uploading img file');
+        error.status = 500;
+        return next(error);
+    });
+});
+exports.addWhitePaper = addWhitePaper;
+const addCaseStudy = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { title, project_scope, project_deliverables, key_tools, customer } = req.body;
+    const csFound = await prisma.caseStudy.findFirst({
+        where: { title }
+    });
+    if (csFound) {
+        const error = new Error("CaseStudy with same title already exists in the database");
+        error.status = 409;
+        return next(error);
+    }
+    const file = req.files.img;
+    const filename = Date.now() + "__" + file.name;
+    const filepath = path_1.default.join(__dirname, `../../public/images/caseStudies/${filename}`);
     fs_1.default.promises.copyFile(file.path, filepath)
         .then(async () => {
-        await prisma.whitePaper.create({
+        await prisma.caseStudy.create({
             data: {
                 title,
-                content,
-                description,
-                date,
-                img: `${process.env.BACKEND_SITE_URL}/images/whitePapers/${filename}`
+                project_scope,
+                project_deliverables,
+                key_tools,
+                customer,
+                img: `${process.env.BACKEND_SITE_URL}/images/caseStudies/${filename}`
             }
         });
         res.status(201).json({
-            message: "WhitePaper created successfully"
+            message: "CaseStudy created successfully"
         });
     })
         .catch(() => {
@@ -43,7 +89,7 @@ const addWhitePaper = (0, express_async_handler_1.default)(async (req, res, next
         next(error);
     });
 });
-exports.addWhitePaper = addWhitePaper;
+exports.addCaseStudy = addCaseStudy;
 const addNews = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { title, description, date, link } = req.body;
     const newsFound = await prisma.news.findFirst({
@@ -124,7 +170,7 @@ const addBlog = (0, express_async_handler_1.default)(async (req, res, next) => {
     }
     const file = req.files.img;
     const filename = Date.now() + "__" + file.name;
-    const filepath = path_1.default.join(__dirname, `../../public/images/webinars/${filename}`);
+    const filepath = path_1.default.join(__dirname, `../../public/images/blogs/${filename}`);
     fs_1.default.promises.copyFile(file.path, filepath)
         .then(async () => {
         await prisma.blog.create({
@@ -145,35 +191,61 @@ const addBlog = (0, express_async_handler_1.default)(async (req, res, next) => {
     });
 });
 exports.addBlog = addBlog;
-const getWhitePapers = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const whitePapers = await prisma.whitePaper.findMany();
-    res.status(200).json({
-        message: "White Papers fetched successfully",
-        whitePapers: whitePapers
+const editWhitePaper = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { title, content, description, date } = req.body;
+    const { id } = req.params;
+    const wpFound = await prisma.whitePaper.findFirst({
+        where: { id }
     });
+    if (!wpFound) {
+        const error = new Error("White Paper doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    const file = req.files?.img;
+    const pdfFile = req.files?.pdf;
+    try {
+        if (file) {
+            const filename = Date.now() + "__" + file.name;
+            const filepath = path_1.default.join(__dirname, `../../public/images/whitePapers/img/${filename}`);
+            await fs_1.default.promises.copyFile(file.path, filepath);
+            if (wpFound.img) {
+                fs_1.default.rmSync(path_1.default.join(__dirname, `../../public/images/whitePapers/img/${wpFound.img.split("/")[wpFound.img.split("/").length - 1]}`));
+            }
+            await prisma.whitePaper.update({
+                where: { id },
+                data: {
+                    img: `${process.env.BACKEND_SITE_URL}/images/whitePapers/img/${filename}`
+                }
+            });
+        }
+        if (pdfFile) {
+            const pdffilename = Date.now() + "__" + pdfFile.name;
+            const pdffilepath = path_1.default.join(__dirname, `../../public/images/whitePapers/pdf/${pdffilename}`);
+            await fs_1.default.promises.copyFile(pdfFile.path, pdffilepath);
+            if (wpFound.pdf) {
+                fs_1.default.rmSync(path_1.default.join(__dirname, `../../public/images/whitePapers/pdf/${wpFound.pdf.split("/")[wpFound.pdf.split("/").length - 1]}`));
+            }
+            await prisma.whitePaper.update({
+                where: { id },
+                data: {
+                    pdf: `${process.env.BACKEND_SITE_URL}/images/whitePapers/pdf/${pdffilename}`,
+                    title,
+                    description,
+                    content,
+                    date
+                }
+            });
+        }
+        res.status(201).json({
+            message: "White Paper edited successfully"
+        });
+    }
+    catch (error) {
+        console.error(error);
+        const err = new Error('Error processing request');
+        err.status = 500;
+        return next(err);
+    }
 });
-exports.getWhitePapers = getWhitePapers;
-const getNews = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const news = await prisma.news.findMany();
-    res.status(200).json({
-        message: "News fetched successfully",
-        whitePapers: news
-    });
-});
-exports.getNews = getNews;
-const getBlogs = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const blogs = await prisma.blog.findMany();
-    res.status(200).json({
-        message: "Blogs fetched successfully",
-        whitePapers: blogs
-    });
-});
-exports.getBlogs = getBlogs;
-const getWebinars = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const webinars = await prisma.webinar.findMany();
-    res.status(200).json({
-        message: "Webinars fetched successfully",
-        whitePapers: webinars
-    });
-});
-exports.getWebinars = getWebinars;
+exports.editWhitePaper = editWhitePaper;
