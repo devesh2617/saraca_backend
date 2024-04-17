@@ -1,5 +1,5 @@
 import express from 'express'
-import { getWhitePapers, getNews, getWebinars, getBlogs, getCaseStudies, getRegions, getPositions, getPosition, getWhitePaper, getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId } from '../controlllers/OrdinaryControllers'
+import { getWhitePapers, getNews, getWebinars, getBlogs, getCaseStudies, getRegions, getPositions,  getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId } from '../controlllers/OrdinaryControllers'
 
 const Router = express.Router();
 
