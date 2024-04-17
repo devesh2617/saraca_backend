@@ -46,12 +46,13 @@ model Position {
   location             String
   function             String
   role                 String
-  jobId                String?
+  jobId                String? @unique
   desiredSkills        String
   desiredQualification String
   desiredExperience    String
   Region               Region?  @relation(fields: [regionId], references: [id])
   regionId             String?
+  isDeleted            Boolean @default(false)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 }

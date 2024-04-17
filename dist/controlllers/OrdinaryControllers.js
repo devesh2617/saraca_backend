@@ -56,7 +56,7 @@ const getRegions = (0, express_async_handler_1.default)(async (req, res, next) =
 });
 exports.getRegions = getRegions;
 const getPositions = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const positions = await prisma.position.findMany({ include: { Region: false }, orderBy: { createdAt: 'desc' } });
+    const positions = await prisma.position.findMany({ include: { Region: true }, orderBy: { createdAt: 'desc' }, where: { isDeleted: false } });
     res.status(200).json({
         message: "Positions fetched successfully",
         positions: positions
@@ -66,7 +66,8 @@ exports.getPositions = getPositions;
 const getPositionbyId = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const position = await prisma.position.findFirst({
-        where: { id }
+        where: { id },
+        include: { Region: true }
     });
     if (!position) {
         const error = new Error("Position don't exist");

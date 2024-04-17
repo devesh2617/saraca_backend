@@ -69,8 +69,9 @@ const deletePosition = asyncHandler(async (req: any, res: Response, next: NextFu
       return next(error)
    }
 
-   await prisma.position.delete({
-      where:{id}
+   await prisma.position.update({
+      where:{id},
+      data:{isDeleted:true}
    })
    
    res.status(201).json({
@@ -78,4 +79,38 @@ const deletePosition = asyncHandler(async (req: any, res: Response, next: NextFu
    })
 })
 
-export { addRegion, addPosition, deletePosition }
+const editPosition = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+   const { title, description, location, functional, role, desiredSkills, desiredQualification, desiredExperience, region } = req.body
+   const {id} = req.params
+   const foundRegion = await prisma.region.findUnique({ where: { name: region } })
+   if (!foundRegion) {
+      const error: any = new Error("Cannot update position as selected region doesn't exist")
+      error.status = 404
+      return next(error)
+   }
+   const foundPosition = await prisma.position.findUnique({ where: { id } })
+   if (!foundPosition) {
+      const error: any = new Error("Position not found")
+      error.status = 404
+      return next(error)
+   }
+   await prisma.position.update({
+      where: { id },
+      data: {
+         title,
+         description,
+         location,
+         function: functional,
+         role, 
+         desiredSkills,
+         desiredQualification,
+         desiredExperience,
+         Region: { connect: { id: foundRegion.id } }
+      }
+   })
+   res.status(200).json({
+      message: "Position updated successfully"
+   })
+})
+
+export { addRegion, addPosition, deletePosition, editPosition }

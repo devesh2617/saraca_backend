@@ -54,7 +54,7 @@ const getRegions = asyncHandler(async (req: any, res: Response, next: NextFuncti
 
  const getPositions = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
    
-    const positions = await prisma.position.findMany({include:{Region:false}, orderBy:{createdAt:'desc'}})
+    const positions = await prisma.position.findMany({include:{Region:true}, orderBy:{createdAt:'desc'}, where:{isDeleted:false}})
     res.status(200).json({
        message: "Positions fetched successfully",
        positions: positions
@@ -64,7 +64,8 @@ const getRegions = asyncHandler(async (req: any, res: Response, next: NextFuncti
  const getPositionbyId = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
    const {id} = req.params
     const position = await prisma.position.findFirst({
-        where:{id}
+        where:{id},
+        include:{Region:true}
     })
     if(!position){
         const error:any = new Error("Position don't exist")

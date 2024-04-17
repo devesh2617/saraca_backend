@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePosition = exports.addPosition = exports.addRegion = void 0;
+exports.editPosition = exports.deletePosition = exports.addPosition = exports.addRegion = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
@@ -69,11 +69,46 @@ const deletePosition = (0, express_async_handler_1.default)(async (req, res, nex
         error.status = 404;
         return next(error);
     }
-    await prisma.position.delete({
-        where: { id }
+    await prisma.position.update({
+        where: { id },
+        data: { isDeleted: true }
     });
     res.status(201).json({
         message: "Position deleted successfully"
     });
 });
 exports.deletePosition = deletePosition;
+const editPosition = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { title, description, location, functional, role, desiredSkills, desiredQualification, desiredExperience, region } = req.body;
+    const { id } = req.params;
+    const foundRegion = await prisma.region.findUnique({ where: { name: region } });
+    if (!foundRegion) {
+        const error = new Error("Cannot update position as selected region doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    const foundPosition = await prisma.position.findUnique({ where: { id } });
+    if (!foundPosition) {
+        const error = new Error("Position not found");
+        error.status = 404;
+        return next(error);
+    }
+    await prisma.position.update({
+        where: { id },
+        data: {
+            title,
+            description,
+            location,
+            function: functional,
+            role,
+            desiredSkills,
+            desiredQualification,
+            desiredExperience,
+            Region: { connect: { id: foundRegion.id } }
+        }
+    });
+    res.status(200).json({
+        message: "Position updated successfully"
+    });
+});
+exports.editPosition = editPosition;
