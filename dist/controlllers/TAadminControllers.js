@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editPosition = exports.deletePosition = exports.addPosition = exports.addRegion = void 0;
+exports.editRegion = exports.editPosition = exports.deletePosition = exports.addPosition = exports.addRegion = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
@@ -28,6 +28,28 @@ const addRegion = (0, express_async_handler_1.default)(async (req, res, next) =>
     });
 });
 exports.addRegion = addRegion;
+const editRegion = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { id } = req.params;
+    const { name } = req.body;
+    const regionFound = await prisma.region.findUnique({
+        where: { id }
+    });
+    if (!regionFound) {
+        const error = new Error("Region not found");
+        error.status = 404;
+        return next(error);
+    }
+    await prisma.region.update({
+        where: { id },
+        data: {
+            name: name
+        }
+    });
+    res.status(201).json({
+        message: "Region updated successfully"
+    });
+});
+exports.editRegion = editRegion;
 const addPosition = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { title, description, location, functional, role, desiredSkills, desiredQualification, desiredExperience, region } = req.body;
     const foundRegion = await prisma.region.findUnique({ where: { name: region } });

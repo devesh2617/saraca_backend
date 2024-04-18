@@ -24,6 +24,27 @@ const addRegion = asyncHandler(async (req: any, res: Response, next: NextFunctio
    })
 })
 
+const editRegion = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+   const { id } = req.params
+   const { name } = req.body
+   const regionFound = await prisma.region.findUnique({
+      where:{id}
+   })
+   if(!regionFound){
+      const error: any = new Error("Region not found")
+      error.status = 404
+      return next(error)
+   }
+   await prisma.region.update({
+      where: {id},
+      data: {
+         name:name
+      }
+   })
+   res.status(201).json({
+      message: "Region updated successfully"
+   })
+})
 
 
 const addPosition = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
@@ -113,4 +134,4 @@ const editPosition = asyncHandler(async (req: any, res: Response, next: NextFunc
    })
 })
 
-export { addRegion, addPosition, deletePosition, editPosition }
+export { addRegion, addPosition, deletePosition, editPosition, editRegion }

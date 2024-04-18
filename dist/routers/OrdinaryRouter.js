@@ -19,4 +19,5 @@ Router.get('/get_news/:id', OrdinaryControllers_1.getNewsbyId);
 Router.get('/get_blog/:id', OrdinaryControllers_1.getBlogbyId);
 Router.get('/get_case_study/:id', OrdinaryControllers_1.getCaseStudybyId);
 Router.get('/get_webinar/:id', OrdinaryControllers_1.getWebinarbyId);
+Router.get('/get_region/:id', OrdinaryControllers_1.getRegionbyId);
 exports.default = Router;

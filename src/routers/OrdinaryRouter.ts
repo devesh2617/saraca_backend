@@ -1,5 +1,5 @@
 import express from 'express'
-import { getWhitePapers, getNews, getWebinars, getBlogs, getCaseStudies, getRegions, getPositions,  getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId } from '../controlllers/OrdinaryControllers'
+import { getWhitePapers, getNews, getWebinars, getBlogs, getCaseStudies, getRegions, getPositions,  getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId, getRegionbyId } from '../controlllers/OrdinaryControllers'
 
 const Router = express.Router();
 
@@ -16,5 +16,6 @@ Router.get('/get_news/:id', getNewsbyId);
 Router.get('/get_blog/:id', getBlogbyId);
 Router.get('/get_case_study/:id', getCaseStudybyId);
 Router.get('/get_webinar/:id', getWebinarbyId);
+Router.get('/get_region/:id', getRegionbyId);
 
 export default Router

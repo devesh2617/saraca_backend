@@ -158,4 +158,21 @@ const getRegions = asyncHandler(async (req: any, res: Response, next: NextFuncti
      })
   })
 
-export { getWhitePapers, getBlogs, getNews, getWebinars, getCaseStudies, getRegions, getPositions, getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId }
+  const getRegionbyId = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const {id} = req.params
+     const region = await prisma.region.findFirst({
+         where:{id}
+     })
+     if(!region){
+         const error:any = new Error("Region don't exist")
+         error.status = 404
+         return next(error)
+     }
+     res.status(200).json({
+        message: "Region fetched successfully",
+        region: region
+     })
+  })
+
+
+export { getWhitePapers, getBlogs, getNews, getWebinars, getCaseStudies, getRegions, getPositions, getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId, getRegionbyId }

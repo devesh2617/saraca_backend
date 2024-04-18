@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getWebinarbyId = exports.getCaseStudybyId = exports.getBlogbyId = exports.getNewsbyId = exports.getWhitePaperbyId = exports.getPositionbyId = exports.getPositions = exports.getRegions = exports.getCaseStudies = exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = void 0;
+exports.getRegionbyId = exports.getWebinarbyId = exports.getCaseStudybyId = exports.getBlogbyId = exports.getNewsbyId = exports.getWhitePaperbyId = exports.getPositionbyId = exports.getPositions = exports.getRegions = exports.getCaseStudies = exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
@@ -160,3 +160,19 @@ const getCaseStudybyId = (0, express_async_handler_1.default)(async (req, res, n
     });
 });
 exports.getCaseStudybyId = getCaseStudybyId;
+const getRegionbyId = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { id } = req.params;
+    const region = await prisma.region.findFirst({
+        where: { id }
+    });
+    if (!region) {
+        const error = new Error("Region don't exist");
+        error.status = 404;
+        return next(error);
+    }
+    res.status(200).json({
+        message: "Region fetched successfully",
+        region: region
+    });
+});
+exports.getRegionbyId = getRegionbyId;
