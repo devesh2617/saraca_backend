@@ -13,5 +13,9 @@ Router.post('/edit_case_study/:id', editCaseStudy);
 Router.post('/edit_news/:id', editNews);
 Router.post('/edit_blog/:id', editBlog);
 Router.post('/edit_webinar/:id', editWebinar);
-
+Router.get('/delete_white_paper/:id');
+Router.get('/delete_case_study/:id');
+Router.get('/delete_news/:id');
+Router.get('/delete_blog/:id');
+Router.get('/delete_webinar/:id');
 export default Router;

@@ -406,6 +406,91 @@ const editNews = (0, express_async_handler_1.default)(async (req, res, next) => 
     }
 });
 exports.editNews = editNews;
+const deleteCaseStudy = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { id } = req.params;
+    const caseStudyFound = await prisma.caseStudy.findFirst({
+        where: { id }
+    });
+    if (!caseStudyFound) {
+        const error = new Error("Case study doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    await prisma.caseStudy.delete({
+        where: { id }
+    });
+    res.status(200).json({
+        message: 'Case study deleted successfully'
+    });
+});
+const deleteWhitePaper = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { id } = req.params;
+    const whitePaperFound = await prisma.whitePaper.findFirst({
+        where: { id }
+    });
+    if (!whitePaperFound) {
+        const error = new Error("White Paper doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    await prisma.whitePaper.delete({
+        where: { id }
+    });
+    res.status(200).json({
+        message: 'White Paper deleted successfully'
+    });
+});
+const deleteBlog = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { id } = req.params;
+    const blogFound = await prisma.blog.findFirst({
+        where: { id }
+    });
+    if (!blogFound) {
+        const error = new Error("Blog doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    await prisma.blog.delete({
+        where: { id }
+    });
+    res.status(200).json({
+        message: 'Blog deleted successfully'
+    });
+});
+const deleteNews = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { id } = req.params;
+    const newsFound = await prisma.news.findFirst({
+        where: { id }
+    });
+    if (!newsFound) {
+        const error = new Error("News doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    await prisma.news.delete({
+        where: { id }
+    });
+    res.status(200).json({
+        message: 'News deleted successfully'
+    });
+});
+const deleteWebinar = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { id } = req.params;
+    const webinarFound = await prisma.webinar.findFirst({
+        where: { id }
+    });
+    if (!webinarFound) {
+        const error = new Error("Webinar doesn't exist");
+        error.status = 404;
+        return next(error);
+    }
+    await prisma.webinar.delete({
+        where: { id }
+    });
+    res.status(200).json({
+        message: 'Webinar deleted successfully'
+    });
+});
 const editCaseStudy = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { title, project_scope, project_deliverables, customer, key_tools } = req.body;
     const { id } = req.params;
