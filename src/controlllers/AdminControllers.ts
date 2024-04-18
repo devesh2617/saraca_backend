@@ -628,4 +628,4 @@ const editCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFun
     }
 });
 
-export { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper, editBlog, editWebinar, editNews, editCaseStudy }
+export { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper, editBlog, editWebinar, editNews, editCaseStudy, deleteWhitePaper, deleteBlog, deleteWebinar, deleteNews, deleteCaseStudy }

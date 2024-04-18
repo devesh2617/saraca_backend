@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editCaseStudy = exports.editNews = exports.editWebinar = exports.editBlog = exports.editWhitePaper = exports.addCaseStudy = exports.addBlog = exports.addWebinar = exports.addNews = exports.addWhitePaper = void 0;
+exports.deleteCaseStudy = exports.deleteNews = exports.deleteWebinar = exports.deleteBlog = exports.deleteWhitePaper = exports.editCaseStudy = exports.editNews = exports.editWebinar = exports.editBlog = exports.editWhitePaper = exports.addCaseStudy = exports.addBlog = exports.addWebinar = exports.addNews = exports.addWhitePaper = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const fs_1 = __importDefault(require("fs"));
@@ -423,6 +423,7 @@ const deleteCaseStudy = (0, express_async_handler_1.default)(async (req, res, ne
         message: 'Case study deleted successfully'
     });
 });
+exports.deleteCaseStudy = deleteCaseStudy;
 const deleteWhitePaper = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const whitePaperFound = await prisma.whitePaper.findFirst({
@@ -440,6 +441,7 @@ const deleteWhitePaper = (0, express_async_handler_1.default)(async (req, res, n
         message: 'White Paper deleted successfully'
     });
 });
+exports.deleteWhitePaper = deleteWhitePaper;
 const deleteBlog = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const blogFound = await prisma.blog.findFirst({
@@ -457,6 +459,7 @@ const deleteBlog = (0, express_async_handler_1.default)(async (req, res, next) =
         message: 'Blog deleted successfully'
     });
 });
+exports.deleteBlog = deleteBlog;
 const deleteNews = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const newsFound = await prisma.news.findFirst({
@@ -474,6 +477,7 @@ const deleteNews = (0, express_async_handler_1.default)(async (req, res, next) =
         message: 'News deleted successfully'
     });
 });
+exports.deleteNews = deleteNews;
 const deleteWebinar = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const webinarFound = await prisma.webinar.findFirst({
@@ -491,6 +495,7 @@ const deleteWebinar = (0, express_async_handler_1.default)(async (req, res, next
         message: 'Webinar deleted successfully'
     });
 });
+exports.deleteWebinar = deleteWebinar;
 const editCaseStudy = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { title, project_scope, project_deliverables, customer, key_tools } = req.body;
     const { id } = req.params;
