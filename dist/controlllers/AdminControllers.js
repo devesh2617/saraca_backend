@@ -10,7 +10,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const prisma = new client_1.PrismaClient();
 const addWhitePaper = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const { title, content, description, date } = req.body;
+    const { title, content, description, date, industry } = req.body;
     const wpFound = await prisma.whitePaper.findFirst({
         where: { title }
     });
@@ -34,6 +34,7 @@ const addWhitePaper = (0, express_async_handler_1.default)(async (req, res, next
                     content,
                     description,
                     date,
+                    industry,
                     img: `${process.env.BACKEND_SITE_URL}/images/whitePapers/img/${filename}`,
                     pdf: `${process.env.BACKEND_SITE_URL}/images/whitePapers/pdf/${pdffilename}`
                 }
@@ -55,7 +56,7 @@ const addWhitePaper = (0, express_async_handler_1.default)(async (req, res, next
 });
 exports.addWhitePaper = addWhitePaper;
 const addCaseStudy = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const { title, project_scope, project_deliverables, key_tools, customer } = req.body;
+    const { title, project_scope, project_deliverables, key_tools, customer, industry } = req.body;
     const csFound = await prisma.caseStudy.findFirst({
         where: { title }
     });
@@ -76,6 +77,7 @@ const addCaseStudy = (0, express_async_handler_1.default)(async (req, res, next)
                 project_deliverables,
                 key_tools,
                 customer,
+                industry,
                 img: `${process.env.BACKEND_SITE_URL}/images/caseStudies/${filename}`
             }
         });
@@ -192,7 +194,7 @@ const addBlog = (0, express_async_handler_1.default)(async (req, res, next) => {
 });
 exports.addBlog = addBlog;
 const editWhitePaper = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const { title, content, description, date } = req.body;
+    const { title, content, description, date, industry } = req.body;
     const { id } = req.params;
     const wpFound = await prisma.whitePaper.findFirst({
         where: { id }
@@ -230,13 +232,19 @@ const editWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
                 where: { id },
                 data: {
                     pdf: `${process.env.BACKEND_SITE_URL}/images/whitePapers/pdf/${pdffilename}`,
-                    title,
-                    description,
-                    content,
-                    date
                 }
             });
         }
+        await prisma.whitePaper.update({
+            where: { id },
+            data: {
+                title,
+                description,
+                content,
+                date,
+                industry
+            }
+        });
         res.status(201).json({
             message: "White Paper edited successfully"
         });
@@ -497,7 +505,7 @@ const deleteWebinar = (0, express_async_handler_1.default)(async (req, res, next
 });
 exports.deleteWebinar = deleteWebinar;
 const editCaseStudy = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const { title, project_scope, project_deliverables, customer, key_tools } = req.body;
+    const { title, project_scope, project_deliverables, customer, key_tools, industry } = req.body;
     const { id } = req.params;
     const caseStudyFound = await prisma.caseStudy.findFirst({
         where: { id }
@@ -524,7 +532,8 @@ const editCaseStudy = (0, express_async_handler_1.default)(async (req, res, next
                     project_scope,
                     project_deliverables,
                     customer,
-                    key_tools
+                    key_tools,
+                    industry
                 }
             });
         }
@@ -537,7 +546,8 @@ const editCaseStudy = (0, express_async_handler_1.default)(async (req, res, next
                     project_scope,
                     project_deliverables,
                     customer,
-                    key_tools
+                    key_tools,
+                    industry
                 }
             });
         }

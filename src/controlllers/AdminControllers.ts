@@ -6,7 +6,7 @@ import path from 'path';
 const prisma = new PrismaClient();
 
 const addWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
-    const { title, content, description, date } = req.body
+    const { title, content, description, date, industry } = req.body
 
     const wpFound = await prisma.whitePaper.findFirst({
         where: { title }
@@ -33,6 +33,7 @@ const addWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFun
                         content,
                         description,
                         date,
+                        industry,
                         img: `${process.env.BACKEND_SITE_URL}/images/whitePapers/img/${filename}`,
                         pdf: `${process.env.BACKEND_SITE_URL}/images/whitePapers/pdf/${pdffilename}`
                     }
@@ -54,7 +55,7 @@ const addWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFun
 })
 
 const addCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
-    const { title, project_scope, project_deliverables, key_tools, customer } = req.body
+    const { title, project_scope, project_deliverables, key_tools, customer, industry } = req.body
 
     const csFound = await prisma.caseStudy.findFirst({
         where: { title }
@@ -79,6 +80,7 @@ const addCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFunc
                     project_deliverables,
                     key_tools,
                     customer,
+                    industry,
                     img: `${process.env.BACKEND_SITE_URL}/images/caseStudies/${filename}`
                 }
             })
@@ -207,7 +209,7 @@ const addBlog = asyncHandler(async (req: any, res: Response, next: NextFunction)
 })
 
 const editWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
-    const { title, content, description, date } = req.body;
+    const { title, content, description, date, industry } = req.body;
     const { id } = req.params;
 
     const wpFound = await prisma.whitePaper.findFirst({
@@ -256,13 +258,19 @@ const editWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFu
                 where: { id },
                 data: {
                     pdf: `${process.env.BACKEND_SITE_URL}/images/whitePapers/pdf/${pdffilename}`,
-                    title,
-                    description,
-                    content,
-                    date
                 }
             });
         }
+        await prisma.whitePaper.update({
+            where: { id },
+            data: {
+                title,
+                description,
+                content,
+                date,
+                industry
+            }
+        })
 
         res.status(201).json({
             message: "White Paper edited successfully"
@@ -450,7 +458,7 @@ const editNews = asyncHandler(async (req: any, res: Response, next: NextFunction
     }
 });
 
-const deleteCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFunction) => {  
+const deleteCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const caseStudyFound = await prisma.caseStudy.findFirst({
@@ -462,18 +470,18 @@ const deleteCaseStudy = asyncHandler(async (req: any, res: Response, next: NextF
         error.status = 404;
         return next(error);
     }
-    
+
     await prisma.caseStudy.delete({
-        where:{id}
+        where: { id }
     })
 
     res.status(200).json({
         message: 'Case study deleted successfully'
     })
-    
+
 });
 
-const deleteWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFunction) => {  
+const deleteWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const whitePaperFound = await prisma.whitePaper.findFirst({
@@ -485,18 +493,18 @@ const deleteWhitePaper = asyncHandler(async (req: any, res: Response, next: Next
         error.status = 404;
         return next(error);
     }
-    
+
     await prisma.whitePaper.delete({
-        where:{id}
+        where: { id }
     })
 
     res.status(200).json({
         message: 'White Paper deleted successfully'
     })
-    
+
 });
 
-const deleteBlog = asyncHandler(async (req: any, res: Response, next: NextFunction) => {  
+const deleteBlog = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const blogFound = await prisma.blog.findFirst({
@@ -508,18 +516,18 @@ const deleteBlog = asyncHandler(async (req: any, res: Response, next: NextFuncti
         error.status = 404;
         return next(error);
     }
-    
+
     await prisma.blog.delete({
-        where:{id}
+        where: { id }
     })
 
     res.status(200).json({
         message: 'Blog deleted successfully'
     })
-    
+
 });
 
-const deleteNews = asyncHandler(async (req: any, res: Response, next: NextFunction) => {  
+const deleteNews = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const newsFound = await prisma.news.findFirst({
@@ -531,18 +539,18 @@ const deleteNews = asyncHandler(async (req: any, res: Response, next: NextFuncti
         error.status = 404;
         return next(error);
     }
-    
+
     await prisma.news.delete({
-        where:{id}
+        where: { id }
     })
 
     res.status(200).json({
         message: 'News deleted successfully'
     })
-    
+
 });
 
-const deleteWebinar = asyncHandler(async (req: any, res: Response, next: NextFunction) => {  
+const deleteWebinar = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const webinarFound = await prisma.webinar.findFirst({
@@ -554,19 +562,19 @@ const deleteWebinar = asyncHandler(async (req: any, res: Response, next: NextFun
         error.status = 404;
         return next(error);
     }
-    
+
     await prisma.webinar.delete({
-        where:{id}
+        where: { id }
     })
 
     res.status(200).json({
         message: 'Webinar deleted successfully'
     })
-    
+
 });
 
 const editCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
-    const { title, project_scope, project_deliverables, customer, key_tools } = req.body;
+    const { title, project_scope, project_deliverables, customer, key_tools, industry } = req.body;
     const { id } = req.params;
 
     const caseStudyFound = await prisma.caseStudy.findFirst({
@@ -600,7 +608,8 @@ const editCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFun
                     project_scope,
                     project_deliverables,
                     customer,
-                    key_tools
+                    key_tools,
+                    industry
                 }
             });
         } else {
@@ -612,7 +621,8 @@ const editCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFun
                     project_scope,
                     project_deliverables,
                     customer,
-                    key_tools
+                    key_tools,
+                    industry
                 }
             });
         }
