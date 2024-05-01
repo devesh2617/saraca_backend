@@ -38,7 +38,7 @@ const styledText = '\x1b[33;4m'; // 33 is for yellow color, 4 is for underline
 const resetFormatting = '\x1b[0m';
 // app.use(cookieParser())
 app.use(express_form_data_1.default.parse({
-    maxFileSize: 10 * 1024 * 1024, // 10MB limit
+    maxFileSize: 100 * 1024 * 1024, // 100MB limit
     autoClean: true // Automatically clean uploaded files
 }));
 app.use(express_form_data_1.default.union());
@@ -124,7 +124,7 @@ app.post('/contact_us', (0, express_async_handler_1.default)(async (req, res, ne
     });
     transporter.sendMail({
         from: `"SARACA Website" <${process.env.USER_EMAIL}>`, // sender address
-        to: `${process.env.CONTACT_SARACA_EMAIL} ${email}`, // list of receivers
+        to: [email, process.env.CONTACT_SARACA_EMAIL], // list of receivers
         subject: "Contact Us mail from SARACA Website", // Subject line
         html: `<!DOCTYPE html>
         <html lang="en">

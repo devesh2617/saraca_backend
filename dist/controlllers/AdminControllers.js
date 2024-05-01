@@ -128,7 +128,7 @@ const addNews = (0, express_async_handler_1.default)(async (req, res, next) => {
 });
 exports.addNews = addNews;
 const addWebinar = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const { title, link } = req.body;
+    const { title, link, date } = req.body;
     const webinarFound = await prisma.webinar.findFirst({
         where: { title }
     });
@@ -146,7 +146,8 @@ const addWebinar = (0, express_async_handler_1.default)(async (req, res, next) =
             data: {
                 title,
                 link,
-                img: `${process.env.BACKEND_SITE_URL}/images/webinars/${filename}`
+                img: `${process.env.BACKEND_SITE_URL}/images/webinars/${filename}`,
+                date
             }
         });
         res.status(201).json({
@@ -161,7 +162,7 @@ const addWebinar = (0, express_async_handler_1.default)(async (req, res, next) =
 });
 exports.addWebinar = addWebinar;
 const addBlog = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const { title, content } = req.body;
+    const { title, content, date } = req.body;
     const blogFound = await prisma.blog.findFirst({
         where: { title }
     });
@@ -179,7 +180,8 @@ const addBlog = (0, express_async_handler_1.default)(async (req, res, next) => {
             data: {
                 title,
                 content,
-                img: `${process.env.BACKEND_SITE_URL}/images/blogs/${filename}`
+                img: `${process.env.BACKEND_SITE_URL}/images/blogs/${filename}`,
+                date
             }
         });
         res.status(201).json({

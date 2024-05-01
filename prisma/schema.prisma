@@ -26,7 +26,7 @@ model User {
 
 model Role {
   id        String   @id @default(uuid())
-  role      String   @unique @default("ordinary")
+  role      String   @unique
   createdAt DateTime @default(now())
   User      User[]
 }
@@ -75,6 +75,7 @@ model Blog {
   title     String   @unique
   img       String
   content   String
+  date      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -84,6 +85,7 @@ model Webinar {
   title     String   @unique
   img       String
   link      String
+  date      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

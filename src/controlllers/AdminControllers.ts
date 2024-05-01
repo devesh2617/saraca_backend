@@ -135,7 +135,7 @@ const addNews = asyncHandler(async (req: any, res: Response, next: NextFunction)
 })
 
 const addWebinar = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
-    const { title, link } = req.body
+    const { title, link, date } = req.body
 
     const webinarFound = await prisma.webinar.findFirst({
         where: { title }
@@ -156,7 +156,8 @@ const addWebinar = asyncHandler(async (req: any, res: Response, next: NextFuncti
                 data: {
                     title,
                     link,
-                    img: `${process.env.BACKEND_SITE_URL}/images/webinars/${filename}`
+                    img: `${process.env.BACKEND_SITE_URL}/images/webinars/${filename}`,
+                    date
                 }
             })
             res.status(201).json({
@@ -172,7 +173,7 @@ const addWebinar = asyncHandler(async (req: any, res: Response, next: NextFuncti
 })
 
 const addBlog = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
-    const { title, content } = req.body
+    const { title, content, date } = req.body
 
     const blogFound = await prisma.blog.findFirst({
         where: { title }
@@ -193,7 +194,8 @@ const addBlog = asyncHandler(async (req: any, res: Response, next: NextFunction)
                 data: {
                     title,
                     content,
-                    img: `${process.env.BACKEND_SITE_URL}/images/blogs/${filename}`
+                    img: `${process.env.BACKEND_SITE_URL}/images/blogs/${filename}`,
+                    date
                 }
             })
             res.status(201).json({
