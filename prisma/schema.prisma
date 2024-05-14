@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  name       String
-  email      String   @unique
-  password   String
-  createdAt  DateTime @default(now())
-  Role       Role?    @relation(fields: [roleId], references: [id])
-  roleId     String?
-  isVerified Boolean?
+  id          String        @id @default(uuid())
+  name        String
+  email       String        @unique
+  password    String
+  createdAt   DateTime      @default(now())
+  Role        Role?         @relation(fields: [roleId], references: [id])
+  roleId      String?
+  isVerified  Boolean?
+  UserDetails UserDetails[]
 }
 
 model Role {
@@ -40,21 +41,22 @@ model Region {
 }
 
 model Position {
-  id                   String   @id @default(uuid())
+  id                   String        @id @default(uuid())
   title                String
   description          String
   location             String
   function             String
   role                 String
-  jobId                String?  @unique
+  jobId                String?       @unique
   desiredSkills        String
   desiredQualification String
   desiredExperience    String
-  Region               Region?  @relation(fields: [regionId], references: [id])
+  Region               Region?       @relation(fields: [regionId], references: [id])
   regionId             String?
-  isDeleted            Boolean  @default(false)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  isDeleted            Boolean       @default(false)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  UserDetails          UserDetails[]
 }
 
 model WhitePaper {
@@ -112,4 +114,37 @@ model CaseStudy {
   key_tools            String
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
+}
+
+model UserDetails {
+  id                                   String   @id @default(uuid())
+  where_did_you_hear_about_us          String?
+  previously_worked_for_saraca         String?
+  country                              String?
+  name                                 String?
+  address                              String?
+  country_code                         String?
+  mobile_no                            String?
+  relevant_experience                  Float?
+  relevant_experience_role_description String?
+  total_experience                     Float?
+  total_experience_role_description     String?
+  school_university                    String?
+  degree                               String?
+  field_of_study                       String?
+  cgpa                                 Float?
+  skills                               String?
+  resume                               String?
+  linkedin_account                     String?
+  agreement_for_contact                String?
+  gender                               String?
+  terms_conditions                     Boolean?
+  created_at                           DateTime @default(now())
+  updated_at                           DateTime @updatedAt
+  Position                             Position @relation(fields: [positionId], references: [id])
+  positionId                           String
+  User                                 User?     @relation(fields: [userId], references: [id])
+  userId                               String?
+
+  @@unique([positionId, userId])
 }

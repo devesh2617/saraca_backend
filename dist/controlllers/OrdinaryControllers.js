@@ -3,12 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendWhitePaper = exports.getWhitePapersbyIndustry = exports.getCaseStudiesbyIndustry = exports.verify_email = exports.check_login = exports.createUser = exports.getPositionsbyRegion = exports.getRegionbyId = exports.getWebinarbyId = exports.getCaseStudybyId = exports.getBlogbyId = exports.getNewsbyId = exports.getWhitePaperbyId = exports.getPositionbyId = exports.getPositions = exports.getRegions = exports.getCaseStudies = exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = void 0;
+exports.saveApplicationForm = exports.getApplicationDetails = exports.saveAgreement = exports.saveExperience = exports.saveEducation = exports.saveMyInfo = exports.searchFeature = exports.sendWhitePaper = exports.getWhitePapersbyIndustry = exports.getCaseStudiesbyIndustry = exports.verify_email = exports.check_login = exports.createUser = exports.getPositionsbyRegion = exports.getRegionbyId = exports.getWebinarbyId = exports.getCaseStudybyId = exports.getBlogbyId = exports.getNewsbyId = exports.getWhitePaperbyId = exports.getPositionbyId = exports.getPositions = exports.getRegions = exports.getCaseStudies = exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 const prisma = new client_1.PrismaClient();
 const transporter = nodemailer_1.default.createTransport({
     service: "gmail",
@@ -285,7 +286,7 @@ const createUser = (0, express_async_handler_1.default)(async (req, res, next) =
 });
 exports.createUser = createUser;
 const check_login = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, positionId } = req.body;
     const user = await prisma.user.findFirst({ where: { email } });
     if (!user) {
         const error = new Error("User not found");
@@ -304,14 +305,20 @@ const check_login = (0, express_async_handler_1.default)(async (req, res, next) 
         error.message = "Password is wrong";
         return next(error);
     }
-    const payload = {
-        id: user.id
-    };
-    const expiresIn = '24h';
-    const token = await jsonwebtoken_1.default.sign(payload, process.env.SECRET_KEY, { expiresIn: expiresIn });
+    const userDetails = await prisma.userDetails.findFirst({
+        where: {
+            userId: user.id,
+            positionId
+        }
+    });
+    if (userDetails?.terms_conditions === true) {
+        const error = new Error("You have already applied to this position");
+        error.status = 409;
+        return next(error);
+    }
     res.status(200).json({
         message: 'Logged in successfully',
-        token
+        userId: user.id
     });
 });
 exports.check_login = check_login;
@@ -397,3 +404,182 @@ const sendWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
     });
 });
 exports.sendWhitePaper = sendWhitePaper;
+const searchFeature = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { query } = req.body;
+    const news = await prisma.$queryRaw `
+    SELECT * 
+    FROM "News" 
+    WHERE similarity(title, ${query}) > 0.1;
+  `;
+    const blogs = await prisma.$queryRaw `
+    SELECT * 
+    FROM "Blog" 
+    WHERE similarity(title, ${query}) > 0.1;
+  `;
+    const caseStudies = await prisma.$queryRaw `
+   SELECT * 
+   FROM "CaseStudy" 
+   WHERE similarity(title, ${query}) > 0.1;
+ `;
+    const webinars = await prisma.$queryRaw `
+   SELECT * 
+   FROM "Webinar" 
+   WHERE similarity(title, ${query}) > 0.1;
+ `;
+    const whitePapers = await prisma.$queryRaw `
+  SELECT * 
+  FROM "WhitePaper" 
+  WHERE similarity(title, ${query}) > 0.1;
+`;
+    res.status(200).json({
+        news: news,
+        blogs: blogs,
+        caseStudies: caseStudies,
+        webinars: webinars,
+        whitePaper: whitePapers
+    });
+});
+exports.searchFeature = searchFeature;
+const saveMyInfo = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { positionId, userId, where_did_you_hear_about_us, previously_worked_for_saraca, country, name, address, country_code, mobile_no } = req.body;
+    const userDetailsFound = await prisma.userDetails.findFirst({
+        where: { positionId, userId }
+    });
+    try {
+        if (!userDetailsFound) {
+            await prisma.userDetails.create({
+                data: {
+                    where_did_you_hear_about_us,
+                    previously_worked_for_saraca,
+                    country,
+                    name,
+                    address,
+                    country_code,
+                    mobile_no,
+                    userId,
+                    positionId,
+                }
+            });
+        }
+        else {
+            await prisma.userDetails.update({
+                where: { id: userDetailsFound.id },
+                data: { where_did_you_hear_about_us, previously_worked_for_saraca, country, name, address, country_code, mobile_no }
+            });
+        }
+        res.status(201).json({
+            message: "Details saved successfully"
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.saveMyInfo = saveMyInfo;
+const saveEducation = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { positionId, userId, school_university, degree, field_of_study, cgpa, skills, linkedin_account, filename } = req.body;
+    const userDetails = await prisma.userDetails.findFirst({
+        where: {
+            userId,
+            positionId
+        }
+    });
+    if (req?.files?.resume) {
+        const file = req.files.resume;
+        const filename = Date.now() + "__" + file.name;
+        const filepath = path_1.default.join(__dirname, `../../public/resumes/${filename}`);
+        fs_1.default.promises.copyFile(file.path, filepath)
+            .then(async () => {
+            await prisma.userDetails.update({
+                where: { id: userDetails.id },
+                data: { school_university, degree, field_of_study, cgpa: parseFloat(cgpa), skills, resume: `${process.env.BACKEND_SITE_URL}/resumes/${filename}`, linkedin_account }
+            });
+            res.status(201).json({
+                message: "Details saved successfully"
+            });
+        })
+            .catch((e) => {
+            console.log(e);
+            const error = new Error('Error uploading file');
+            error.status = 500;
+            return next(error);
+        });
+    }
+    else {
+        await prisma.userDetails.update({
+            where: { id: userDetails.id },
+            data: { school_university, degree, field_of_study, cgpa: parseFloat(cgpa), skills, resume: filename, linkedin_account }
+        });
+        res.status(201).json({
+            message: "Details saved successfully"
+        });
+    }
+});
+exports.saveEducation = saveEducation;
+const saveExperience = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { positionId, userId, relevant_experience, relevant_experience_role_description, total_experience, total_experience_role_description } = req.body;
+    const userDetails = await prisma.userDetails.findFirst({
+        where: { positionId, userId }
+    });
+    await prisma.userDetails.update({
+        where: { id: userDetails.id },
+        data: { relevant_experience: parseFloat(relevant_experience), relevant_experience_role_description, total_experience: parseFloat(total_experience), total_experience_role_description }
+    });
+    res.status(201).json({
+        message: "Details saved successfully"
+    });
+});
+exports.saveExperience = saveExperience;
+const saveAgreement = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { positionId, userId, agreement_for_contact, gender } = req.body;
+    const userDetails = await prisma.userDetails.findFirst({
+        where: { positionId, userId }
+    });
+    await prisma.userDetails.update({
+        where: { id: userDetails.id },
+        data: { agreement_for_contact, gender }
+    });
+    res.status(201).json({
+        message: "Details saved successfully"
+    });
+});
+exports.saveAgreement = saveAgreement;
+const saveApplicationForm = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { positionId, userId } = req.body;
+    const userDetails = await prisma.userDetails.findFirst({
+        where: { positionId, userId }
+    });
+    await prisma.userDetails.update({
+        where: { id: userDetails.id },
+        data: { terms_conditions: true }
+    });
+    res.status(201).json({
+        message: "Application submitted successfully"
+    });
+});
+exports.saveApplicationForm = saveApplicationForm;
+const getApplicationDetails = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { positionId, userId } = req.body;
+    const userDetails = await prisma.userDetails.findFirst({
+        where: {
+            userId,
+            positionId
+        }
+    });
+    if (!userDetails) {
+        const userDetailsLatest = await prisma.userDetails.findFirst({
+            where: { userId, terms_conditions: true },
+            orderBy: { updated_at: "desc" }
+        });
+        res.status(200).json({
+            message: "Details fetched successfully",
+            userDetails: userDetailsLatest
+        });
+    }
+    else
+        res.status(200).json({
+            message: "Details fetched successfully",
+            userDetails: userDetails
+        });
+});
+exports.getApplicationDetails = getApplicationDetails;

@@ -1,5 +1,5 @@
 import express from 'express'
-import { getWhitePapers, getNews, getWebinars, getBlogs, getCaseStudies, getRegions, getPositions,  getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId, getRegionbyId, getPositionsbyRegion, createUser, check_login, verify_email, getWhitePapersbyIndustry, getCaseStudiesbyIndustry, sendWhitePaper } from '../controlllers/OrdinaryControllers'
+import { getWhitePapers, getNews, getWebinars, getBlogs, getCaseStudies, getRegions, getPositions,  getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId, getRegionbyId, getPositionsbyRegion, createUser, check_login, verify_email, getWhitePapersbyIndustry, getCaseStudiesbyIndustry, sendWhitePaper, searchFeature, saveMyInfo,saveEducation, saveExperience, saveAgreement, getApplicationDetails, saveApplicationForm } from '../controlllers/OrdinaryControllers'
 
 const Router = express.Router();
 
@@ -24,5 +24,12 @@ Router.post('/career/register_user', createUser);
 Router.post('/career/login_user', check_login);
 Router.get('/career/verify_email/:id', verify_email);
 Router.post('/send_white_paper/:id', sendWhitePaper);
+Router.post('/search', searchFeature);
+Router.post('/career/save_my_information', saveMyInfo);
+Router.post('/career/save_education', saveEducation);
+Router.post('/career/save_experience', saveExperience);
+Router.post('/career/save_agreement', saveAgreement);
+Router.post('/career/get_my_application_details', getApplicationDetails);
+Router.post('/career/save_application_form', saveApplicationForm);
 
 export default Router

@@ -28,7 +28,8 @@ dotenv.config()
 const PORT = 5000;
 const corsOptions = {
   origin: 'http://localhost:5173', // Allow requests from this origin
-  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  credentials: true
 };
 const styledText = '\x1b[33;4m'; // 33 is for yellow color, 4 is for underline
 const resetFormatting = '\x1b[0m';

@@ -4,6 +4,9 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from "bcrypt"
 import nodemailer from 'nodemailer';
 import jwt from "jsonwebtoken"
+import path from 'path';
+import fs from 'fs';
+
 
 const prisma = new PrismaClient();
 const transporter = nodemailer.createTransport({
@@ -22,7 +25,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 const getWhitePapersbyIndustry = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
-    const whitePapers = await prisma.whitePaper.findMany({ orderBy: { industry:'asc' } })
+    const whitePapers = await prisma.whitePaper.findMany({ orderBy: { industry: 'asc' } })
     const industryWiseRecords = {};
 
     whitePapers.forEach(record => {
@@ -32,7 +35,7 @@ const getWhitePapersbyIndustry = asyncHandler(async (req: any, res: Response, ne
         }
         industryWiseRecords[industry].push(record);
     });
-   
+
     res.status(200).json({
         message: "White Papers fetched successfully",
         whitePapers: industryWiseRecords
@@ -41,7 +44,7 @@ const getWhitePapersbyIndustry = asyncHandler(async (req: any, res: Response, ne
 
 const getWhitePapers = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
     const whitePapers = await prisma.whitePaper.findMany({ orderBy: { createdAt: 'desc' } })
-     
+
     res.status(200).json({
         message: "White Papers fetched successfully",
         whitePapers: whitePapers
@@ -268,7 +271,7 @@ const createUser = asyncHandler(async (req, res, next) => {
         }
     });
 
-    
+
     // Generate an activation link (this is a placeholder, you'll need to implement this)
     const activationLink = `${process.env.FRONTEND_SITE_URL}/activate/${user.id}`;
 
@@ -294,7 +297,8 @@ const createUser = asyncHandler(async (req, res, next) => {
 })
 
 const check_login = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
-    const { email, password } = req.body
+    const { email, password, positionId } = req.body
+    
     const user = await prisma.user.findFirst({ where: { email } })
     if (!user) {
         const error: any = new Error("User not found")
@@ -315,17 +319,22 @@ const check_login = asyncHandler(async (req: any, res: Response, next: NextFunct
         error.message = "Password is wrong"
         return next(error)
     }
-
-    const payload = {
-        id: user.id
+    const userDetails = await prisma.userDetails.findFirst({
+        where:{
+            userId: user.id,
+            positionId
+        }
+    })
+    if(userDetails?.terms_conditions === true) {
+        const error:any =  new Error("You have already applied to this position")
+        error.status = 409
+        return next(error)
     }
-    const expiresIn = '24h'
-    const token = await jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: expiresIn })
+    
     res.status(200).json({
         message: 'Logged in successfully',
-        token
+        userId: user.id
     })
-
 })
 
 const verify_email = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
@@ -350,18 +359,18 @@ const verify_email = asyncHandler(async (req: any, res: Response, next: NextFunc
 })
 
 const sendWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
-    const {id} = req.params
+    const { id } = req.params
     const { name, email, organisationName } = req.body
     const WhitePaper = await prisma.whitePaper.findFirst({
-        where:{id}
+        where: { id }
     })
-    
-   if(!WhitePaper){
-    const error:any = new Error("White Paper not found")
-    error.status = 404
-    return next(error)
-   }
-   
+
+    if (!WhitePaper) {
+        const error: any = new Error("White Paper not found")
+        error.status = 404
+        return next(error)
+    }
+
     const mailOptions = {
         from: process.env.USER_EMAIL,
         to: [email, process.env.USER_EMAIL],
@@ -389,14 +398,14 @@ const sendWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFu
             </style>
         </head>
         <body>
-            <p>Hello ${name} ${organisationName?"("+organisationName+")":""}</p>
+            <p>Hello ${name} ${organisationName ? "(" + organisationName + ")" : ""}</p>
             <p>Thanks for showing interest in our white paper. We appreciate the time you spent on our website. We hope you have liked our website. Please feel free to send any feedback you may have for us. Please find attached the white paper.</p>
             <p>Please feel free to reach out to us at <a href="mailto:contact@saracasolutions.com">contact@saracasolutions.com</a> for any questions you may have.</p>
             <p>Warm Regards,</p>
             <p>Team SARACA</p>
         </body>
         </html>`,
-        attachments:[{
+        attachments: [{
             filename: WhitePaper.title,
             path: WhitePaper.pdf
         }]
@@ -416,4 +425,198 @@ const sendWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFu
 
 })
 
-export { getWhitePapers, getBlogs, getNews, getWebinars, getCaseStudies, getRegions, getPositions, getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId, getRegionbyId, getPositionsbyRegion, createUser, check_login, verify_email, getCaseStudiesbyIndustry, getWhitePapersbyIndustry, sendWhitePaper }
+const searchFeature = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const { query } = req.body
+    const news = await prisma.$queryRaw`
+    SELECT * 
+    FROM "News" 
+    WHERE similarity(title, ${query}) > 0.1;
+  `;
+    const blogs = await prisma.$queryRaw`
+    SELECT * 
+    FROM "Blog" 
+    WHERE similarity(title, ${query}) > 0.1;
+  `;
+    const caseStudies = await prisma.$queryRaw`
+   SELECT * 
+   FROM "CaseStudy" 
+   WHERE similarity(title, ${query}) > 0.1;
+ `;
+    const webinars = await prisma.$queryRaw`
+   SELECT * 
+   FROM "Webinar" 
+   WHERE similarity(title, ${query}) > 0.1;
+ `;
+    const whitePapers = await prisma.$queryRaw`
+  SELECT * 
+  FROM "WhitePaper" 
+  WHERE similarity(title, ${query}) > 0.1;
+`;
+    res.status(200).json({
+        news: news,
+        blogs: blogs,
+        caseStudies: caseStudies,
+        webinars: webinars,
+        whitePaper: whitePapers
+    })
+})
+
+const saveMyInfo = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const { positionId, userId, where_did_you_hear_about_us, previously_worked_for_saraca, country, name, address, country_code, mobile_no } = req.body
+    const userDetailsFound = await prisma.userDetails.findFirst({
+        where: { positionId, userId }
+    })
+    try {
+        
+        if (!userDetailsFound) {
+            await prisma.userDetails.create({
+                data: {
+                    where_did_you_hear_about_us,
+                    previously_worked_for_saraca,
+                    country,
+                    name,
+                    address,
+                    country_code,
+                    mobile_no,
+                    userId,
+                    positionId,
+                }
+            })
+        }
+        else {
+            await prisma.userDetails.update({
+                where: { id:userDetailsFound.id },
+                data: { where_did_you_hear_about_us, previously_worked_for_saraca, country, name, address, country_code, mobile_no }
+            })
+
+        }
+        res.status(201).json({
+            message: "Details saved successfully"
+        })
+    } catch (error) {
+        next(error)
+    }
+
+})
+
+const saveEducation = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const { positionId, userId, school_university, degree, field_of_study, cgpa, skills, linkedin_account, filename } = req.body
+    const userDetails = await prisma.userDetails.findFirst({
+        where:{
+            userId,
+            positionId
+        }
+    })
+    if(req?.files?.resume){
+        const file = req.files.resume;
+   
+        const filename = Date.now() + "__" + file.name;
+        const filepath = path.join(__dirname, `../../public/resumes/${filename}`)
+        
+        fs.promises.copyFile(file.path, filepath)
+            .then(async () => {
+                await prisma.userDetails.update({
+                    where: { id: userDetails.id },
+                    data: { school_university, degree, field_of_study, cgpa: parseFloat(cgpa), skills, resume: `${process.env.BACKEND_SITE_URL}/resumes/${filename}`, linkedin_account }
+                })
+                res.status(201).json({
+                    message: "Details saved successfully"
+                })
+            })
+            .catch((e) => {
+                console.log(e)
+                const error: any = new Error('Error uploading file')
+                error.status = 500
+                return next(error)
+            });
+    }
+    else {
+        await prisma.userDetails.update({
+            where: { id: userDetails.id },
+            data: { school_university, degree, field_of_study, cgpa: parseFloat(cgpa), skills, resume:filename, linkedin_account }
+        })
+        res.status(201).json({
+            message: "Details saved successfully"
+        })
+    }
+
+})
+
+const saveExperience = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const { positionId, userId, relevant_experience,relevant_experience_role_description,total_experience,total_experience_role_description } = req.body
+    const userDetails = await prisma.userDetails.findFirst({
+        where: { positionId, userId }
+    })
+
+    await prisma.userDetails.update({
+        where: { id:userDetails.id },
+        data: { relevant_experience: parseFloat(relevant_experience),relevant_experience_role_description, total_experience:parseFloat(total_experience), total_experience_role_description }
+    })
+   
+    res.status(201).json({
+        message: "Details saved successfully"
+    })
+
+})
+
+const saveAgreement = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const { positionId, userId, agreement_for_contact, gender } = req.body
+    const userDetails = await prisma.userDetails.findFirst({
+        where: { positionId, userId }
+    })
+
+    await prisma.userDetails.update({
+        where: { id: userDetails.id },
+        data: { agreement_for_contact, gender }
+    })
+   
+    res.status(201).json({
+        message: "Details saved successfully"
+    })
+
+})
+
+const saveApplicationForm = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const { positionId, userId } = req.body
+    const userDetails = await prisma.userDetails.findFirst({
+        where: { positionId, userId }
+    })
+
+    await prisma.userDetails.update({
+        where: { id: userDetails.id },
+        data: { terms_conditions: true }
+    })
+   
+    res.status(201).json({
+        message: "Application submitted successfully"
+    })
+
+})
+
+const getApplicationDetails = asyncHandler(async (req: any, res: Response, next: NextFunction) => {
+    const {positionId, userId} = req.body
+    const userDetails = await prisma.userDetails.findFirst({
+        where:{
+            userId,
+            positionId
+        }
+    })
+
+    if(!userDetails){
+        const userDetailsLatest = await prisma.userDetails.findFirst({
+            where: {userId, terms_conditions: true},
+            orderBy: {updated_at:"desc"}
+        })
+        res.status(200).json({
+            message:"Details fetched successfully",
+            userDetails: userDetailsLatest
+        }) 
+    }
+    else res.status(200).json({
+        message:"Details fetched successfully",
+        userDetails: userDetails
+    })
+})
+
+
+export { getWhitePapers, getBlogs, getNews, getWebinars, getCaseStudies, getRegions, getPositions, getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId, getRegionbyId, getPositionsbyRegion, createUser, check_login, verify_email, getCaseStudiesbyIndustry, getWhitePapersbyIndustry, sendWhitePaper, searchFeature, saveMyInfo, saveEducation, saveExperience, saveAgreement, getApplicationDetails, saveApplicationForm }
