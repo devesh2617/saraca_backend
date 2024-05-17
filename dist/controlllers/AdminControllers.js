@@ -35,8 +35,8 @@ const addWhitePaper = (0, express_async_handler_1.default)(async (req, res, next
                     description,
                     date,
                     industry,
-                    img: `${process.env.BACKEND_SITE_URL}/images/whitePapers/img/${filename}`,
-                    pdf: `${process.env.BACKEND_SITE_URL}/images/whitePapers/pdf/${pdffilename}`
+                    img: `/images/whitePapers/img/${filename}`,
+                    pdf: `/images/whitePapers/pdf/${pdffilename}`
                 }
             });
             res.status(201).json({
@@ -78,7 +78,7 @@ const addCaseStudy = (0, express_async_handler_1.default)(async (req, res, next)
                 key_tools,
                 customer,
                 industry,
-                img: `${process.env.BACKEND_SITE_URL}/images/caseStudies/${filename}`
+                img: `/images/caseStudies/${filename}`
             }
         });
         res.status(201).json({
@@ -113,7 +113,7 @@ const addNews = (0, express_async_handler_1.default)(async (req, res, next) => {
                 link,
                 description,
                 date,
-                img: `${process.env.BACKEND_SITE_URL}/images/news/${filename}`
+                img: `/images/news/${filename}`
             }
         });
         res.status(201).json({
@@ -146,7 +146,7 @@ const addWebinar = (0, express_async_handler_1.default)(async (req, res, next) =
             data: {
                 title,
                 link,
-                img: `${process.env.BACKEND_SITE_URL}/images/webinars/${filename}`,
+                img: `/images/webinars/${filename}`,
                 date
             }
         });
@@ -180,7 +180,7 @@ const addBlog = (0, express_async_handler_1.default)(async (req, res, next) => {
             data: {
                 title,
                 content,
-                img: `${process.env.BACKEND_SITE_URL}/images/blogs/${filename}`,
+                img: `/images/blogs/${filename}`,
                 date
             }
         });
@@ -219,7 +219,7 @@ const editWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
             await prisma.whitePaper.update({
                 where: { id },
                 data: {
-                    img: `${process.env.BACKEND_SITE_URL}/images/whitePapers/img/${filename}`
+                    img: `/images/whitePapers/img/${filename}`
                 }
             });
         }
@@ -233,7 +233,7 @@ const editWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
             await prisma.whitePaper.update({
                 where: { id },
                 data: {
-                    pdf: `${process.env.BACKEND_SITE_URL}/images/whitePapers/pdf/${pdffilename}`,
+                    pdf: `/images/whitePapers/pdf/${pdffilename}`,
                 }
             });
         }
@@ -282,7 +282,7 @@ const editBlog = (0, express_async_handler_1.default)(async (req, res, next) => 
             await prisma.blog.update({
                 where: { id },
                 data: {
-                    img: `${process.env.BACKEND_SITE_URL}/images/blogs/${filename}`,
+                    img: `/images/blogs/${filename}`,
                     title,
                     content
                 }
@@ -333,7 +333,7 @@ const editWebinar = (0, express_async_handler_1.default)(async (req, res, next) 
             await prisma.webinar.update({
                 where: { id },
                 data: {
-                    img: `${process.env.BACKEND_SITE_URL}/images/webinars/${filename}`,
+                    img: `/images/webinars/${filename}`,
                     title,
                     link
                 }
@@ -384,7 +384,7 @@ const editNews = (0, express_async_handler_1.default)(async (req, res, next) => 
             await prisma.news.update({
                 where: { id },
                 data: {
-                    img: `${process.env.BACKEND_SITE_URL}/images/news/${filename}`,
+                    img: `/images/news/${filename}`,
                     title,
                     description,
                     date,
@@ -529,7 +529,7 @@ const editCaseStudy = (0, express_async_handler_1.default)(async (req, res, next
             await prisma.caseStudy.update({
                 where: { id },
                 data: {
-                    img: `${process.env.BACKEND_SITE_URL}/images/case-studies/${filename}`,
+                    img: `/images/case-studies/${filename}`,
                     title,
                     project_scope,
                     project_deliverables,

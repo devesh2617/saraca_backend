@@ -34,8 +34,8 @@ const addWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFun
                         description,
                         date,
                         industry,
-                        img: `${process.env.BACKEND_SITE_URL}/images/whitePapers/img/${filename}`,
-                        pdf: `${process.env.BACKEND_SITE_URL}/images/whitePapers/pdf/${pdffilename}`
+                        img: `/images/whitePapers/img/${filename}`,
+                        pdf: `/images/whitePapers/pdf/${pdffilename}`
                     }
                 })
                 res.status(201).json({
@@ -81,7 +81,7 @@ const addCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFunc
                     key_tools,
                     customer,
                     industry,
-                    img: `${process.env.BACKEND_SITE_URL}/images/caseStudies/${filename}`
+                    img: `/images/caseStudies/${filename}`
                 }
             })
             res.status(201).json({
@@ -119,7 +119,7 @@ const addNews = asyncHandler(async (req: any, res: Response, next: NextFunction)
                     link,
                     description,
                     date,
-                    img: `${process.env.BACKEND_SITE_URL}/images/news/${filename}`
+                    img: `/images/news/${filename}`
                 }
             })
             res.status(201).json({
@@ -156,7 +156,7 @@ const addWebinar = asyncHandler(async (req: any, res: Response, next: NextFuncti
                 data: {
                     title,
                     link,
-                    img: `${process.env.BACKEND_SITE_URL}/images/webinars/${filename}`,
+                    img: `/images/webinars/${filename}`,
                     date
                 }
             })
@@ -194,7 +194,7 @@ const addBlog = asyncHandler(async (req: any, res: Response, next: NextFunction)
                 data: {
                     title,
                     content,
-                    img: `${process.env.BACKEND_SITE_URL}/images/blogs/${filename}`,
+                    img: `/images/blogs/${filename}`,
                     date
                 }
             })
@@ -241,7 +241,7 @@ const editWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFu
             await prisma.whitePaper.update({
                 where: { id },
                 data: {
-                    img: `${process.env.BACKEND_SITE_URL}/images/whitePapers/img/${filename}`
+                    img: `/images/whitePapers/img/${filename}`
                 }
             });
         }
@@ -259,7 +259,7 @@ const editWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFu
             await prisma.whitePaper.update({
                 where: { id },
                 data: {
-                    pdf: `${process.env.BACKEND_SITE_URL}/images/whitePapers/pdf/${pdffilename}`,
+                    pdf: `/images/whitePapers/pdf/${pdffilename}`,
                 }
             });
         }
@@ -315,7 +315,7 @@ const editBlog = asyncHandler(async (req: any, res: Response, next: NextFunction
             await prisma.blog.update({
                 where: { id },
                 data: {
-                    img: `${process.env.BACKEND_SITE_URL}/images/blogs/${filename}`,
+                    img: `/images/blogs/${filename}`,
                     title,
                     content
                 }
@@ -372,7 +372,7 @@ const editWebinar = asyncHandler(async (req: any, res: Response, next: NextFunct
             await prisma.webinar.update({
                 where: { id },
                 data: {
-                    img: `${process.env.BACKEND_SITE_URL}/images/webinars/${filename}`,
+                    img: `/images/webinars/${filename}`,
                     title,
                     link
                 }
@@ -429,7 +429,7 @@ const editNews = asyncHandler(async (req: any, res: Response, next: NextFunction
             await prisma.news.update({
                 where: { id },
                 data: {
-                    img: `${process.env.BACKEND_SITE_URL}/images/news/${filename}`,
+                    img: `/images/news/${filename}`,
                     title,
                     description,
                     date,
@@ -605,7 +605,7 @@ const editCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFun
             await prisma.caseStudy.update({
                 where: { id },
                 data: {
-                    img: `${process.env.BACKEND_SITE_URL}/images/case-studies/${filename}`,
+                    img: `/images/case-studies/${filename}`,
                     title,
                     project_scope,
                     project_deliverables,

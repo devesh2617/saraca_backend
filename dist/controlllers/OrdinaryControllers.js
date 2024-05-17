@@ -388,7 +388,7 @@ const sendWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
         </html>`,
         attachments: [{
                 filename: WhitePaper.title,
-                path: WhitePaper.pdf
+                path: process.env.BACKEND_SITE_URL + WhitePaper.pdf
             }]
     };
     transporter.sendMail(mailOptions, (error, info) => {

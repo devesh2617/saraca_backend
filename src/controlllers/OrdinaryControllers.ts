@@ -407,7 +407,7 @@ const sendWhitePaper = asyncHandler(async (req: any, res: Response, next: NextFu
         </html>`,
         attachments: [{
             filename: WhitePaper.title,
-            path: WhitePaper.pdf
+            path: process.env.BACKEND_SITE_URL+WhitePaper.pdf
         }]
     };
 
