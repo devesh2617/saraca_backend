@@ -492,7 +492,7 @@ const saveEducation = (0, express_async_handler_1.default)(async (req, res, next
             .then(async () => {
             await prisma.userDetails.update({
                 where: { id: userDetails.id },
-                data: { school_university, degree, field_of_study, cgpa: parseFloat(cgpa), skills, resume: `${process.env.BACKEND_SITE_URL}/resumes/${filename}`, linkedin_account }
+                data: { school_university, degree, field_of_study, cgpa: parseFloat(cgpa), skills, resume: `/resumes/${filename}`, linkedin_account }
             });
             res.status(201).json({
                 message: "Details saved successfully"
