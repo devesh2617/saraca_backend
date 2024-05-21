@@ -31,7 +31,7 @@ dotenv_1.default.config();
 // }
 const PORT = 5000;
 const corsOptions = {
-    origin: process.env.BACKEND_SITE_URL, // Allow requests from this origin
+    origin: process.env.FRONTEND_SITE_URL, // Allow requests from this origin
     optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
     credentials: true
 };
