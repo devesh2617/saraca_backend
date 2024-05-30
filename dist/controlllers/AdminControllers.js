@@ -521,15 +521,15 @@ const editCaseStudy = (0, express_async_handler_1.default)(async (req, res, next
     try {
         if (file) {
             const filename = Date.now() + "__" + file.name;
-            const filepath = path_1.default.join(__dirname, `../../public/images/case-studies/${filename}`);
+            const filepath = path_1.default.join(__dirname, `../../public/images/caseStudies/${filename}`);
             await fs_1.default.promises.copyFile(file.path, filepath);
             if (caseStudyFound.img) {
-                fs_1.default.rmSync(path_1.default.join(__dirname, `../../public/images/case-studies/${caseStudyFound.img.split("/")[caseStudyFound.img.split("/").length - 1]}`));
+                fs_1.default.rmSync(path_1.default.join(__dirname, `../../public/images/caseStudies/${caseStudyFound.img.split("/")[caseStudyFound.img.split("/").length - 1]}`));
             }
             await prisma.caseStudy.update({
                 where: { id },
                 data: {
-                    img: `/images/case-studies/${filename}`,
+                    img: `/images/caseStudies/${filename}`,
                     title,
                     project_scope,
                     project_deliverables,
