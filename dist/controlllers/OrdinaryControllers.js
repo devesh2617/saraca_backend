@@ -371,12 +371,14 @@ const sendWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
         return next(error);
     }
     const mailOptions = {
-        from: process.env.USER_EMAIL,
-        to: [email, process.env.USER_EMAIL],
+        from: `"SARACA Website" <${process.env.USER_EMAIL}>`,
+        to: [email, process.env.CONTACT_SARACA_EMAIL],
         subject: "Thank you! for downloading SARACA whitepaper",
         html: `<!DOCTYPE html>
-        <html>
+        <html lang="en">
         <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>SARACA White Paper</title>
             <style>
                 body {
