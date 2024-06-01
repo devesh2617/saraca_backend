@@ -10,6 +10,8 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
 const transporter = nodemailer_1.default.createTransport({
     service: "gmail",
@@ -20,6 +22,8 @@ const transporter = nodemailer_1.default.createTransport({
         user: process.env.USER_EMAIL,
         pass: process.env.PASS,
     },
+    logger: true,
+    debug: true,
 });
 const getWhitePapersbyIndustry = (0, express_async_handler_1.default)(async (req, res, next) => {
     const whitePapers = await prisma.whitePaper.findMany({
@@ -285,7 +289,7 @@ const createUser = (0, express_async_handler_1.default)(async (req, res, next) =
     const activationLink = `${process.env.FRONTEND_SITE_URL}/activate/${user.id}`;
     // Send the activation email
     const mailOptions = {
-        from: process.env.USER_EMAIL,
+        from: `"SARACA Website" <${process.env.USER_EMAIL}>`,
         to: email,
         subject: "Account Activation",
         text: `Hello ${name},\n\nPlease click the following link to activate your account:\n${activationLink}\n\nBest regards,\nYour Team`,
