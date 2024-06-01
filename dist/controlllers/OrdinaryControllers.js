@@ -14,22 +14,19 @@ const prisma = new client_1.PrismaClient();
 const transporter = nodemailer_1.default.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // Use `true` for port 465, `false` for all other ports
+    port: 587,
+    secure: false, // Use `true` for port 465, `false` for all other ports
     auth: {
         user: process.env.USER_EMAIL,
         pass: process.env.PASS,
     },
-    tls: {
-        // Enable TLS
-        ciphers: 'SSLv3',
-        rejectUnauthorized: false // Disables certificate validation for testing purposes
-    }
 });
 const getWhitePapersbyIndustry = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const whitePapers = await prisma.whitePaper.findMany({ orderBy: { industry: 'asc' } });
+    const whitePapers = await prisma.whitePaper.findMany({
+        orderBy: { industry: "asc" },
+    });
     const industryWiseRecords = {};
-    whitePapers.forEach(record => {
+    whitePapers.forEach((record) => {
         const industry = record.industry;
         if (!industryWiseRecords[industry]) {
             industryWiseRecords[industry] = [];
@@ -38,46 +35,54 @@ const getWhitePapersbyIndustry = (0, express_async_handler_1.default)(async (req
     });
     res.status(200).json({
         message: "White Papers fetched successfully",
-        whitePapers: industryWiseRecords
+        whitePapers: industryWiseRecords,
     });
 });
 exports.getWhitePapersbyIndustry = getWhitePapersbyIndustry;
 const getWhitePapers = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const whitePapers = await prisma.whitePaper.findMany({ orderBy: { createdAt: 'desc' } });
+    const whitePapers = await prisma.whitePaper.findMany({
+        orderBy: { createdAt: "desc" },
+    });
     res.status(200).json({
         message: "White Papers fetched successfully",
-        whitePapers: whitePapers
+        whitePapers: whitePapers,
     });
 });
 exports.getWhitePapers = getWhitePapers;
 const getNews = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const news = await prisma.news.findMany({ orderBy: { createdAt: 'desc' } });
+    const news = await prisma.news.findMany({ orderBy: { createdAt: "desc" } });
     res.status(200).json({
         message: "News fetched successfully",
-        news: news
+        news: news,
     });
 });
 exports.getNews = getNews;
 const getBlogs = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const blogs = await prisma.blog.findMany({ orderBy: { createdAt: 'desc' } });
+    const blogs = await prisma.blog.findMany({
+        orderBy: { createdAt: "desc" },
+    });
     res.status(200).json({
         message: "Blogs fetched successfully",
-        blogs: blogs
+        blogs: blogs,
     });
 });
 exports.getBlogs = getBlogs;
 const getWebinars = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const webinars = await prisma.webinar.findMany({ orderBy: { createdAt: 'desc' } });
+    const webinars = await prisma.webinar.findMany({
+        orderBy: { createdAt: "desc" },
+    });
     res.status(200).json({
         message: "Webinars fetched successfully",
-        webinars: webinars
+        webinars: webinars,
     });
 });
 exports.getWebinars = getWebinars;
 const getCaseStudiesbyIndustry = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const caseStudies = await prisma.caseStudy.findMany({ orderBy: { industry: 'asc' } });
+    const caseStudies = await prisma.caseStudy.findMany({
+        orderBy: { industry: "asc" },
+    });
     const industryWiseRecords = {};
-    caseStudies.forEach(record => {
+    caseStudies.forEach((record) => {
         const industry = record.industry;
         if (!industryWiseRecords[industry]) {
             industryWiseRecords[industry] = [];
@@ -86,40 +91,53 @@ const getCaseStudiesbyIndustry = (0, express_async_handler_1.default)(async (req
     });
     res.status(200).json({
         message: "Case Studies fetched successfully",
-        caseStudies: industryWiseRecords
+        caseStudies: industryWiseRecords,
     });
 });
 exports.getCaseStudiesbyIndustry = getCaseStudiesbyIndustry;
 const getCaseStudies = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const caseStudies = await prisma.caseStudy.findMany({ orderBy: { createdAt: 'desc' } });
+    const caseStudies = await prisma.caseStudy.findMany({
+        orderBy: { createdAt: "desc" },
+    });
     res.status(200).json({
         message: "Case Studies fetched successfully",
-        caseStudies: caseStudies
+        caseStudies: caseStudies,
     });
 });
 exports.getCaseStudies = getCaseStudies;
 const getRegions = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const regions = await prisma.region.findMany({ include: { Position: false }, orderBy: { createdAt: 'desc' } });
+    const regions = await prisma.region.findMany({
+        include: { Position: false },
+        orderBy: { createdAt: "desc" },
+    });
     res.status(201).json({
         message: "Regions fetched succesfully",
-        regions: regions
+        regions: regions,
     });
 });
 exports.getRegions = getRegions;
 const getPositions = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const positions = await prisma.position.findMany({ include: { Region: true }, orderBy: { createdAt: 'desc' }, where: { isDeleted: false } });
+    const positions = await prisma.position.findMany({
+        include: { Region: true },
+        orderBy: { createdAt: "desc" },
+        where: { isDeleted: false },
+    });
     res.status(200).json({
         message: "Positions fetched successfully",
-        positions: positions
+        positions: positions,
     });
 });
 exports.getPositions = getPositions;
 const getPositionsbyRegion = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { region_name } = req.params;
-    const positions = await prisma.position.findMany({ include: { Region: true }, orderBy: { createdAt: 'desc' }, where: { isDeleted: false, Region: { name: region_name } } });
+    const positions = await prisma.position.findMany({
+        include: { Region: true },
+        orderBy: { createdAt: "desc" },
+        where: { isDeleted: false, Region: { name: region_name } },
+    });
     res.status(200).json({
         message: "Positions fetched successfully",
-        positions: positions
+        positions: positions,
     });
 });
 exports.getPositionsbyRegion = getPositionsbyRegion;
@@ -127,7 +145,7 @@ const getPositionbyId = (0, express_async_handler_1.default)(async (req, res, ne
     const { id } = req.params;
     const position = await prisma.position.findFirst({
         where: { id },
-        include: { Region: true }
+        include: { Region: true },
     });
     if (!position) {
         const error = new Error("Position don't exist");
@@ -136,14 +154,14 @@ const getPositionbyId = (0, express_async_handler_1.default)(async (req, res, ne
     }
     res.status(200).json({
         message: "Position fetched successfully",
-        position: position
+        position: position,
     });
 });
 exports.getPositionbyId = getPositionbyId;
 const getWhitePaperbyId = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const wp = await prisma.whitePaper.findFirst({
-        where: { id }
+        where: { id },
     });
     if (!wp) {
         const error = new Error("White paper don't exist");
@@ -152,14 +170,14 @@ const getWhitePaperbyId = (0, express_async_handler_1.default)(async (req, res, 
     }
     res.status(200).json({
         message: "WhitePaper fetched successfully",
-        whitePaper: wp
+        whitePaper: wp,
     });
 });
 exports.getWhitePaperbyId = getWhitePaperbyId;
 const getBlogbyId = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const blog = await prisma.blog.findFirst({
-        where: { id }
+        where: { id },
     });
     if (!blog) {
         const error = new Error("Blog don't exist");
@@ -168,14 +186,14 @@ const getBlogbyId = (0, express_async_handler_1.default)(async (req, res, next) 
     }
     res.status(200).json({
         message: "Blog fetched successfully",
-        blog: blog
+        blog: blog,
     });
 });
 exports.getBlogbyId = getBlogbyId;
 const getWebinarbyId = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const webinar = await prisma.webinar.findFirst({
-        where: { id }
+        where: { id },
     });
     if (!webinar) {
         const error = new Error("Webinar don't exist");
@@ -184,14 +202,14 @@ const getWebinarbyId = (0, express_async_handler_1.default)(async (req, res, nex
     }
     res.status(200).json({
         message: "Webinar fetched successfully",
-        webinar: webinar
+        webinar: webinar,
     });
 });
 exports.getWebinarbyId = getWebinarbyId;
 const getNewsbyId = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const news = await prisma.news.findFirst({
-        where: { id }
+        where: { id },
     });
     if (!news) {
         const error = new Error("News don't exist");
@@ -200,14 +218,14 @@ const getNewsbyId = (0, express_async_handler_1.default)(async (req, res, next) 
     }
     res.status(200).json({
         message: "News fetched successfully",
-        news: news
+        news: news,
     });
 });
 exports.getNewsbyId = getNewsbyId;
 const getCaseStudybyId = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const cs = await prisma.caseStudy.findFirst({
-        where: { id }
+        where: { id },
     });
     if (!cs) {
         const error = new Error("Case Study don't exist");
@@ -216,14 +234,14 @@ const getCaseStudybyId = (0, express_async_handler_1.default)(async (req, res, n
     }
     res.status(200).json({
         message: "Case Study fetched successfully",
-        caseStudy: cs
+        caseStudy: cs,
     });
 });
 exports.getCaseStudybyId = getCaseStudybyId;
 const getRegionbyId = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { id } = req.params;
     const region = await prisma.region.findFirst({
-        where: { id }
+        where: { id },
     });
     if (!region) {
         const error = new Error("Region don't exist");
@@ -232,7 +250,7 @@ const getRegionbyId = (0, express_async_handler_1.default)(async (req, res, next
     }
     res.status(200).json({
         message: "Region fetched successfully",
-        region: region
+        region: region,
     });
 });
 exports.getRegionbyId = getRegionbyId;
@@ -246,7 +264,7 @@ const createUser = (0, express_async_handler_1.default)(async (req, res, next) =
         return next(error);
     }
     const roleFound = await prisma.role.findUnique({
-        where: { role: "ordinary" }
+        where: { role: "ordinary" },
     });
     if (!roleFound) {
         const error = new Error();
@@ -260,8 +278,8 @@ const createUser = (0, express_async_handler_1.default)(async (req, res, next) =
             name,
             email,
             password: hash,
-            Role: { connect: { id: roleFound.id } }
-        }
+            Role: { connect: { id: roleFound.id } },
+        },
     });
     // Generate an activation link (this is a placeholder, you'll need to implement this)
     const activationLink = `${process.env.FRONTEND_SITE_URL}/activate/${user.id}`;
@@ -269,8 +287,8 @@ const createUser = (0, express_async_handler_1.default)(async (req, res, next) =
     const mailOptions = {
         from: process.env.USER_EMAIL,
         to: email,
-        subject: 'Account Activation',
-        text: `Hello ${name},\n\nPlease click the following link to activate your account:\n${activationLink}\n\nBest regards,\nYour Team`
+        subject: "Account Activation",
+        text: `Hello ${name},\n\nPlease click the following link to activate your account:\n${activationLink}\n\nBest regards,\nYour Team`,
     };
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
@@ -278,10 +296,10 @@ const createUser = (0, express_async_handler_1.default)(async (req, res, next) =
             error.status = 500;
             return next(error);
         }
-        console.log('Email sent: ' + info.response);
+        console.log("Email sent: " + info.response);
     });
     res.status(201).json({
-        message: "Verification link send to your email. Please verify your account."
+        message: "Verification link send to your email. Please verify your account.",
     });
 });
 exports.createUser = createUser;
@@ -308,8 +326,8 @@ const check_login = (0, express_async_handler_1.default)(async (req, res, next) 
     const userDetails = await prisma.userDetails.findFirst({
         where: {
             userId: user.id,
-            positionId
-        }
+            positionId,
+        },
     });
     if (userDetails?.terms_conditions === true) {
         const error = new Error("You have already applied to this position");
@@ -317,8 +335,8 @@ const check_login = (0, express_async_handler_1.default)(async (req, res, next) 
         return next(error);
     }
     res.status(200).json({
-        message: 'Logged in successfully',
-        userId: user.id
+        message: "Logged in successfully",
+        userId: user.id,
     });
 });
 exports.check_login = check_login;
@@ -337,7 +355,7 @@ const verify_email = (0, express_async_handler_1.default)(async (req, res, next)
     }
     await prisma.user.update({ where: { id }, data: { isVerified: true } });
     res.status(200).json({
-        message: 'Verified Successfully'
+        message: "Verified Successfully",
     });
 });
 exports.verify_email = verify_email;
@@ -345,7 +363,7 @@ const sendWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
     const { id } = req.params;
     const { name, email, organisationName } = req.body;
     const WhitePaper = await prisma.whitePaper.findFirst({
-        where: { id }
+        where: { id },
     });
     if (!WhitePaper) {
         const error = new Error("White Paper not found");
@@ -355,7 +373,7 @@ const sendWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
     const mailOptions = {
         from: process.env.USER_EMAIL,
         to: [email, process.env.USER_EMAIL],
-        subject: 'Thank you! for downloading SARACA whitepaper',
+        subject: "Thank you! for downloading SARACA whitepaper",
         html: `<!DOCTYPE html>
         <html>
         <head>
@@ -386,20 +404,25 @@ const sendWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
             <p>Team SARACA</p>
         </body>
         </html>`,
-        attachments: [{
+        attachments: [
+            {
                 filename: WhitePaper.title,
-                path: process.env.BACKEND_SITE_URL + WhitePaper.pdf
-            }]
+                path: process.env.BACKEND_SITE_URL + WhitePaper.pdf,
+                contentType: "application/pdf", // Specify content type
+                contentDisposition: "attachment", // Specify content disposition
+            },
+        ],
     };
+    // console.log(process.env.BACKEND_SITE_URL + WhitePaper.pdf);
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
             const error = new Error("Error sending mail");
             error.status = 500;
             return next(error);
         }
-        console.log('Email sent: ' + info.response);
+        console.log("Email sent: " + info.response);
         res.status(200).json({
-            message: 'White Paper sent to your email'
+            message: "White Paper sent to your email",
         });
     });
 });
@@ -436,14 +459,14 @@ const searchFeature = (0, express_async_handler_1.default)(async (req, res, next
         blogs: blogs,
         caseStudies: caseStudies,
         webinars: webinars,
-        whitePaper: whitePapers
+        whitePaper: whitePapers,
     });
 });
 exports.searchFeature = searchFeature;
 const saveMyInfo = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const { positionId, userId, where_did_you_hear_about_us, previously_worked_for_saraca, country, name, address, country_code, mobile_no } = req.body;
+    const { positionId, userId, where_did_you_hear_about_us, previously_worked_for_saraca, country, name, address, country_code, mobile_no, } = req.body;
     const userDetailsFound = await prisma.userDetails.findFirst({
-        where: { positionId, userId }
+        where: { positionId, userId },
     });
     try {
         if (!userDetailsFound) {
@@ -458,17 +481,25 @@ const saveMyInfo = (0, express_async_handler_1.default)(async (req, res, next) =
                     mobile_no,
                     userId,
                     positionId,
-                }
+                },
             });
         }
         else {
             await prisma.userDetails.update({
                 where: { id: userDetailsFound.id },
-                data: { where_did_you_hear_about_us, previously_worked_for_saraca, country, name, address, country_code, mobile_no }
+                data: {
+                    where_did_you_hear_about_us,
+                    previously_worked_for_saraca,
+                    country,
+                    name,
+                    address,
+                    country_code,
+                    mobile_no,
+                },
             });
         }
         res.status(201).json({
-            message: "Details saved successfully"
+            message: "Details saved successfully",
         });
     }
     catch (error) {
@@ -477,30 +508,39 @@ const saveMyInfo = (0, express_async_handler_1.default)(async (req, res, next) =
 });
 exports.saveMyInfo = saveMyInfo;
 const saveEducation = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const { positionId, userId, school_university, degree, field_of_study, cgpa, skills, linkedin_account, filename } = req.body;
+    const { positionId, userId, school_university, degree, field_of_study, cgpa, skills, linkedin_account, filename, } = req.body;
     const userDetails = await prisma.userDetails.findFirst({
         where: {
             userId,
-            positionId
-        }
+            positionId,
+        },
     });
     if (req?.files?.resume) {
         const file = req.files.resume;
         const filename = Date.now() + "__" + file.name;
         const filepath = path_1.default.join(__dirname, `../../public/resumes/${filename}`);
-        fs_1.default.promises.copyFile(file.path, filepath)
+        fs_1.default.promises
+            .copyFile(file.path, filepath)
             .then(async () => {
             await prisma.userDetails.update({
                 where: { id: userDetails.id },
-                data: { school_university, degree, field_of_study, cgpa: parseFloat(cgpa), skills, resume: `/resumes/${filename}`, linkedin_account }
+                data: {
+                    school_university,
+                    degree,
+                    field_of_study,
+                    cgpa: parseFloat(cgpa),
+                    skills,
+                    resume: `/resumes/${filename}`,
+                    linkedin_account,
+                },
             });
             res.status(201).json({
-                message: "Details saved successfully"
+                message: "Details saved successfully",
             });
         })
             .catch((e) => {
             console.log(e);
-            const error = new Error('Error uploading file');
+            const error = new Error("Error uploading file");
             error.status = 500;
             return next(error);
         });
@@ -508,53 +548,66 @@ const saveEducation = (0, express_async_handler_1.default)(async (req, res, next
     else {
         await prisma.userDetails.update({
             where: { id: userDetails.id },
-            data: { school_university, degree, field_of_study, cgpa: parseFloat(cgpa), skills, resume: filename, linkedin_account }
+            data: {
+                school_university,
+                degree,
+                field_of_study,
+                cgpa: parseFloat(cgpa),
+                skills,
+                resume: filename,
+                linkedin_account,
+            },
         });
         res.status(201).json({
-            message: "Details saved successfully"
+            message: "Details saved successfully",
         });
     }
 });
 exports.saveEducation = saveEducation;
 const saveExperience = (0, express_async_handler_1.default)(async (req, res, next) => {
-    const { positionId, userId, relevant_experience, relevant_experience_role_description, total_experience, total_experience_role_description } = req.body;
+    const { positionId, userId, relevant_experience, relevant_experience_role_description, total_experience, total_experience_role_description, } = req.body;
     const userDetails = await prisma.userDetails.findFirst({
-        where: { positionId, userId }
+        where: { positionId, userId },
     });
     await prisma.userDetails.update({
         where: { id: userDetails.id },
-        data: { relevant_experience: parseFloat(relevant_experience), relevant_experience_role_description, total_experience: parseFloat(total_experience), total_experience_role_description }
+        data: {
+            relevant_experience: parseFloat(relevant_experience),
+            relevant_experience_role_description,
+            total_experience: parseFloat(total_experience),
+            total_experience_role_description,
+        },
     });
     res.status(201).json({
-        message: "Details saved successfully"
+        message: "Details saved successfully",
     });
 });
 exports.saveExperience = saveExperience;
 const saveAgreement = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { positionId, userId, agreement_for_contact, gender } = req.body;
     const userDetails = await prisma.userDetails.findFirst({
-        where: { positionId, userId }
+        where: { positionId, userId },
     });
     await prisma.userDetails.update({
         where: { id: userDetails.id },
-        data: { agreement_for_contact, gender }
+        data: { agreement_for_contact, gender },
     });
     res.status(201).json({
-        message: "Details saved successfully"
+        message: "Details saved successfully",
     });
 });
 exports.saveAgreement = saveAgreement;
 const saveApplicationForm = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { positionId, userId } = req.body;
     const userDetails = await prisma.userDetails.findFirst({
-        where: { positionId, userId }
+        where: { positionId, userId },
     });
     await prisma.userDetails.update({
         where: { id: userDetails.id },
-        data: { terms_conditions: true }
+        data: { terms_conditions: true },
     });
     res.status(201).json({
-        message: "Application submitted successfully"
+        message: "Application submitted successfully",
     });
 });
 exports.saveApplicationForm = saveApplicationForm;
@@ -563,23 +616,23 @@ const getApplicationDetails = (0, express_async_handler_1.default)(async (req, r
     const userDetails = await prisma.userDetails.findFirst({
         where: {
             userId,
-            positionId
-        }
+            positionId,
+        },
     });
     if (!userDetails) {
         const userDetailsLatest = await prisma.userDetails.findFirst({
             where: { userId, terms_conditions: true },
-            orderBy: { updated_at: "desc" }
+            orderBy: { updated_at: "desc" },
         });
         res.status(200).json({
             message: "Details fetched successfully",
-            userDetails: userDetailsLatest
+            userDetails: userDetailsLatest,
         });
     }
     else
         res.status(200).json({
             message: "Details fetched successfully",
-            userDetails: userDetails
+            userDetails: userDetails,
         });
 });
 exports.getApplicationDetails = getApplicationDetails;
