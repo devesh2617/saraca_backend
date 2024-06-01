@@ -6,6 +6,8 @@ import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import path from "path";
 import fs from "fs";
+import dotenv from 'dotenv'
+dotenv.config()
 
 const prisma = new PrismaClient();
 const transporter = nodemailer.createTransport({
@@ -17,6 +19,8 @@ const transporter = nodemailer.createTransport({
     user: process.env.USER_EMAIL,
     pass: process.env.PASS,
   },
+  logger: true,
+  debug: true,
 });
 const getWhitePapersbyIndustry = asyncHandler(
   async (req: any, res: Response, next: NextFunction) => {
@@ -325,7 +329,7 @@ const createUser = asyncHandler(async (req, res, next) => {
 
   // Send the activation email
   const mailOptions = {
-    from: process.env.USER_EMAIL,
+    from: `"SARACA Website" <${process.env.USER_EMAIL}>`,
     to: email,
     subject: "Account Activation",
     text: `Hello ${name},\n\nPlease click the following link to activate your account:\n${activationLink}\n\nBest regards,\nYour Team`,
