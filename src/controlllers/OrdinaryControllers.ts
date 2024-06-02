@@ -3,7 +3,7 @@ import asyncHandler from "express-async-handler";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 import path from "path";
 import fs from "fs";
 import dotenv from 'dotenv'
@@ -19,8 +19,8 @@ const transporter = nodemailer.createTransport({
     user: process.env.USER_EMAIL,
     pass: process.env.PASS,
   },
-  logger: true,
-  debug: true,
+  // logger: true,
+  // debug: true,
 });
 const getWhitePapersbyIndustry = asyncHandler(
   async (req: any, res: Response, next: NextFunction) => {
@@ -470,8 +470,8 @@ const sendWhitePaper = asyncHandler(
         </html>`,
       attachments: [
         {
-          filename: WhitePaper.title,
-          path: process.env.BACKEND_SITE_URL + WhitePaper.pdf,
+          filename: WhitePaper.title+".pdf",
+          path: process.env.BACKEND_SITE_URL + WhitePaper?.pdf?.split("__")[0]+"__"+encodeURIComponent(WhitePaper?.pdf?.split("__")[1]),
           contentType: "application/pdf", // Specify content type
           contentDisposition: "attachment", // Specify content disposition
         },

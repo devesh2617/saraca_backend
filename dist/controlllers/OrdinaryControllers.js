@@ -8,6 +8,7 @@ const express_async_handler_1 = __importDefault(require("express-async-handler")
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
+// import jwt from "jsonwebtoken";
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -22,8 +23,8 @@ const transporter = nodemailer_1.default.createTransport({
         user: process.env.USER_EMAIL,
         pass: process.env.PASS,
     },
-    logger: true,
-    debug: true,
+    // logger: true,
+    // debug: true,
 });
 const getWhitePapersbyIndustry = (0, express_async_handler_1.default)(async (req, res, next) => {
     const whitePapers = await prisma.whitePaper.findMany({
@@ -412,8 +413,8 @@ const sendWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
         </html>`,
         attachments: [
             {
-                filename: WhitePaper.title,
-                path: process.env.BACKEND_SITE_URL + WhitePaper.pdf,
+                filename: WhitePaper.title + ".pdf",
+                path: process.env.BACKEND_SITE_URL + WhitePaper?.pdf?.split("__")[0] + "__" + encodeURIComponent(WhitePaper?.pdf?.split("__")[1]),
                 contentType: "application/pdf", // Specify content type
                 contentDisposition: "attachment", // Specify content disposition
             },
