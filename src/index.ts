@@ -26,8 +26,9 @@ dotenv.config()
 //   domain: process.env.FRONTEND_SITE_URL
 // }
 const PORT = 5000;
+const allowedOrigins = process.env.FRONTEND_SITE_URL.split(',');
 const corsOptions = {
-  origin: process.env.FRONTEND_SITE_URL, // Allow requests from this origin
+  origin: allowedOrigins, // Allow requests from this origin
   optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
   credentials: true
 };
