@@ -114,8 +114,7 @@ app.use('/api', OrdinaryRouter_1.default);
 app.post('/contact_us', (0, express_async_handler_1.default)(async (req, res, next) => {
     const { name, email, country_code, organisation, mobile_no, country, industry, message } = req.body;
     const transporter = nodemailer_1.default.createTransport({
-        service: "gmail",
-        host: "smtp.gmail.com",
+        host: "smtp.office365.com",
         port: 587,
         secure: false, // Use `true` for port 465, `false` for all other ports
         auth: {
@@ -123,6 +122,7 @@ app.post('/contact_us', (0, express_async_handler_1.default)(async (req, res, ne
             pass: process.env.PASS,
         },
     });
+    // console.log(process.env.PASS)
     transporter.sendMail({
         from: `"SARACA Website" <${process.env.USER_EMAIL}>`, // sender address
         to: [email, process.env.CONTACT_SARACA_EMAIL], // list of receivers
@@ -142,7 +142,7 @@ app.post('/contact_us', (0, express_async_handler_1.default)(async (req, res, ne
             }
             table {
               border-collapse: collapse;
-              width: 100%;
+              max-width: 700px;
               background-color: #fff;
               border-radius: 5px;
             }
@@ -160,6 +160,7 @@ app.post('/contact_us', (0, express_async_handler_1.default)(async (req, res, ne
           </style>
         </head>
         <body>
+          <h4>Your Email has been sent successfully we will get back to you soon.</h4>
           <table>
             <tr class="highlight">
               <th colspan="2">Contact Information</th>
@@ -198,7 +199,9 @@ app.post('/contact_us', (0, express_async_handler_1.default)(async (req, res, ne
         `, // html body
     }, (err, info) => {
         if (err) {
-            next(err);
+            const error = new Error("Failed to send Email");
+            error.status = 500;
+            return next(err);
         }
         return res.status(200).json({
             message: "Email Sent Successfully",

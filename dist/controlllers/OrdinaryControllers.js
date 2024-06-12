@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.saveApplicationForm = exports.getApplicationDetails = exports.saveAgreement = exports.saveExperience = exports.saveEducation = exports.saveMyInfo = exports.searchFeature = exports.sendWhitePaper = exports.getWhitePapersbyIndustry = exports.getCaseStudiesbyIndustry = exports.verify_email = exports.check_login = exports.createUser = exports.getPositionsbyRegion = exports.getRegionbyId = exports.getWebinarbyId = exports.getCaseStudybyId = exports.getBlogbyId = exports.getNewsbyId = exports.getWhitePaperbyId = exports.getPositionbyId = exports.getPositions = exports.getRegions = exports.getCaseStudies = exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = void 0;
+exports.getDiscoverMore = exports.saveApplicationForm = exports.getApplicationDetails = exports.saveAgreement = exports.saveExperience = exports.saveEducation = exports.saveMyInfo = exports.searchFeature = exports.sendWhitePaper = exports.getWhitePapersbyIndustry = exports.getCaseStudiesbyIndustry = exports.verify_email = exports.check_login = exports.createUser = exports.getPositionsbyRegion = exports.getRegionbyId = exports.getWebinarbyId = exports.getCaseStudybyId = exports.getBlogbyId = exports.getNewsbyId = exports.getWhitePaperbyId = exports.getPositionbyId = exports.getPositions = exports.getRegions = exports.getCaseStudies = exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -13,10 +13,11 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const prisma = new client_1.PrismaClient();
+const prisma = new client_1.PrismaClient({
+    log: ["query"]
+});
 const transporter = nodemailer_1.default.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
+    host: "smtp.office365.com",
     port: 587,
     secure: false, // Use `true` for port 465, `false` for all other ports
     auth: {
@@ -427,7 +428,6 @@ const sendWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
             error.status = 500;
             return next(error);
         }
-        console.log("Email sent: " + info.response);
         res.status(200).json({
             message: "White Paper sent to your email",
         });
@@ -643,3 +643,37 @@ const getApplicationDetails = (0, express_async_handler_1.default)(async (req, r
         });
 });
 exports.getApplicationDetails = getApplicationDetails;
+const getDiscoverMore = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { object } = req.body;
+    let { ids } = JSON.parse(object);
+    const idsString = ids.map(id => `'${id}'`).join(',');
+    let data = [];
+    const news = await prisma.$queryRaw `
+        SELECT id, img, link 
+        FROM "News" 
+        WHERE id in (${idsString})
+      `;
+    const blogs = await prisma.$queryRaw `
+    SELECT id, img, concat('/blog/', id) as link
+    FROM "Blog" 
+    WHERE id in (${idsString})
+  `;
+    const webinars = await prisma.$queryRaw `
+   SELECT id, img, link 
+   FROM "Webinar" 
+   WHERE id in (${idsString})
+ `;
+    const whitePapers = await prisma.$queryRaw `
+   SELECT id, img, concat('/white_paper/', id) as link 
+   FROM "WhitePaper" 
+   WHERE id in (${idsString})
+ `;
+    const caseStudies = await prisma.$queryRaw `
+   SELECT id, img, concat('/case_study/', id) as link
+   FROM "CaseStudy" 
+   WHERE id in (${idsString})
+ `;
+    data = [...news, ...blogs, ...webinars, ...whitePapers, ...caseStudies];
+    res.status(200).json({ data: data });
+});
+exports.getDiscoverMore = getDiscoverMore;

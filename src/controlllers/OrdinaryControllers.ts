@@ -9,10 +9,12 @@ import fs from "fs";
 import dotenv from 'dotenv'
 dotenv.config()
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ["query"]
+});
+
 const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
+  host: "smtp.office365.com",
   port: 587,
   secure: false, // Use `true` for port 465, `false` for all other ports
   auth: {
@@ -459,9 +461,8 @@ const sendWhitePaper = asyncHandler(
             </style>
         </head>
         <body>
-            <p>Hello ${name} ${
-        organisationName ? "(" + organisationName + ")" : ""
-      }</p>
+            <p>Hello ${name} ${organisationName ? "(" + organisationName + ")" : ""
+        }</p>
             <p>Thanks for showing interest in our white paper. We appreciate the time you spent on our website. We hope you have liked our website. Please feel free to send any feedback you may have for us. Please find attached the white paper.</p>
             <p>Please feel free to reach out to us at <a href="mailto:contact@saracasolutions.com">contact@saracasolutions.com</a> for any questions you may have.</p>
             <p>Warm Regards,</p>
@@ -470,8 +471,8 @@ const sendWhitePaper = asyncHandler(
         </html>`,
       attachments: [
         {
-          filename: WhitePaper.title+".pdf",
-          path: process.env.BACKEND_SITE_URL + WhitePaper?.pdf?.split("__")[0]+"__"+encodeURIComponent(WhitePaper?.pdf?.split("__")[1]),
+          filename: WhitePaper.title + ".pdf",
+          path: process.env.BACKEND_SITE_URL + WhitePaper?.pdf?.split("__")[0] + "__" + encodeURIComponent(WhitePaper?.pdf?.split("__")[1]),
           contentType: "application/pdf", // Specify content type
           contentDisposition: "attachment", // Specify content disposition
         },
@@ -484,7 +485,6 @@ const sendWhitePaper = asyncHandler(
         error.status = 500;
         return next(error);
       }
-      console.log("Email sent: " + info.response);
       res.status(200).json({
         message: "White Paper sent to your email",
       });
@@ -747,6 +747,43 @@ const getApplicationDetails = asyncHandler(
   }
 );
 
+const getDiscoverMore = asyncHandler(
+  async (req: any, res: Response, next: NextFunction) => {
+    const { object } = req.body
+    let { ids } = JSON.parse(object)
+    const idsString = ids.map(id => `'${id}'`).join(',');
+    
+    let data = []
+    const news: { id: string; img: string, link: string }[] = await prisma.$queryRaw`
+        SELECT id, img, link 
+        FROM "News" 
+        WHERE id in (${idsString})
+      `;
+    const blogs: { id: string; img: string, link: string }[] = await prisma.$queryRaw`
+    SELECT id, img, concat('/blog/', id) as link
+    FROM "Blog" 
+    WHERE id in (${idsString})
+  `;
+    const webinars: { id: string; img: string, link: string }[] = await prisma.$queryRaw`
+   SELECT id, img, link 
+   FROM "Webinar" 
+   WHERE id in (${idsString})
+ `;
+    const whitePapers: { id: string; img: string, link: string }[] = await prisma.$queryRaw`
+   SELECT id, img, concat('/white_paper/', id) as link 
+   FROM "WhitePaper" 
+   WHERE id in (${idsString})
+ `;
+    const caseStudies: { id: string; img: string, link: string }[] = await prisma.$queryRaw`
+   SELECT id, img, concat('/case_study/', id) as link
+   FROM "CaseStudy" 
+   WHERE id in (${idsString})
+ `;
+    data = [...news, ...blogs, ...webinars, ...whitePapers, ...caseStudies]
+    res.status(200).json({ data: data })
+  }
+);
+
 export {
   getWhitePapers,
   getBlogs,
@@ -776,4 +813,5 @@ export {
   saveAgreement,
   getApplicationDetails,
   saveApplicationForm,
+  getDiscoverMore
 };

@@ -34,4 +34,5 @@ Router.post('/career/save_experience', OrdinaryControllers_1.saveExperience);
 Router.post('/career/save_agreement', OrdinaryControllers_1.saveAgreement);
 Router.post('/career/get_my_application_details', OrdinaryControllers_1.getApplicationDetails);
 Router.post('/career/save_application_form', OrdinaryControllers_1.saveApplicationForm);
+Router.post('/get_discover_more_by_ids', OrdinaryControllers_1.getDiscoverMore);
 exports.default = Router;
