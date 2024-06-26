@@ -327,7 +327,7 @@ const createUser = asyncHandler(async (req, res, next) => {
   });
 
   // Generate an activation link (this is a placeholder, you'll need to implement this)
-  const activationLink = `${process.env.FRONTEND_SITE_URL}activate/${user.id}`;
+  const activationLink = `${process.env.FRONTEND_SITE_URL.split(",")[0]}activate/${user.id}`;
 
   // Send the activation email
   const mailOptions = {

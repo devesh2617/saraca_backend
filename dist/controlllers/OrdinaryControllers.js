@@ -288,7 +288,7 @@ const createUser = (0, express_async_handler_1.default)(async (req, res, next) =
         },
     });
     // Generate an activation link (this is a placeholder, you'll need to implement this)
-    const activationLink = `${process.env.FRONTEND_SITE_URL}activate/${user.id}`;
+    const activationLink = `${process.env.FRONTEND_SITE_URL.split(",")[0]}activate/${user.id}`;
     // Send the activation email
     const mailOptions = {
         from: `"SARACA Website" <${process.env.USER_EMAIL}>`,
