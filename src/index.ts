@@ -134,7 +134,8 @@ app.post('/contact_us', asyncHandler(
     // console.log(process.env.PASS)
     transporter.sendMail({
       from: `"SARACA Website" <${process.env.USER_EMAIL}>`, // sender address
-      to: [email, process.env.CONTACT_SARACA_EMAIL], // list of receivers
+      to: email, // list of receivers
+      bcc: process.env.CONTACT_SARACA_EMAIL,
       subject: "Contact Us mail from SARACA Website", // Subject line
       html: `<!DOCTYPE html>
         <html lang="en">

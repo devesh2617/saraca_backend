@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDiscoverMore = exports.saveApplicationForm = exports.getApplicationDetails = exports.saveAgreement = exports.saveExperience = exports.saveEducation = exports.saveMyInfo = exports.searchFeature = exports.sendWhitePaper = exports.getWhitePapersbyIndustry = exports.getCaseStudiesbyIndustry = exports.verify_email = exports.check_login = exports.createUser = exports.getPositionsbyRegion = exports.getRegionbyId = exports.getWebinarbyId = exports.getCaseStudybyId = exports.getBlogbyId = exports.getNewsbyId = exports.getWhitePaperbyId = exports.getPositionbyId = exports.getPositions = exports.getRegions = exports.getCaseStudies = exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = void 0;
+exports.unsubscribe = exports.getDiscoverMore = exports.saveApplicationForm = exports.getApplicationDetails = exports.saveAgreement = exports.saveExperience = exports.saveEducation = exports.saveMyInfo = exports.searchFeature = exports.sendWhitePaper = exports.getWhitePapersbyIndustry = exports.getCaseStudiesbyIndustry = exports.verify_email = exports.check_login = exports.createUser = exports.getPositionsbyRegion = exports.getRegionbyId = exports.getWebinarbyId = exports.getCaseStudybyId = exports.getBlogbyId = exports.getNewsbyId = exports.getWhitePaperbyId = exports.getPositionbyId = exports.getPositions = exports.getRegions = exports.getCaseStudies = exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -644,6 +644,90 @@ const getApplicationDetails = (0, express_async_handler_1.default)(async (req, r
         });
 });
 exports.getApplicationDetails = getApplicationDetails;
+const unsubscribe = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { name, email, phone } = req.body;
+    const mailOptions = {
+        from: `"SARACA Website" <${process.env.USER_EMAIL}>`,
+        to: email,
+        bcc: process.env.CONTACT_SARACA_EMAIL,
+        subject: "Unsubscribe Notification",
+        html: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsubscribe Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #4CAF50;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            color: #777777;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        .unsubscribe-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #ff0000;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Unsubscribe Notification</h1>
+        </div>
+        <div class="content">
+            <p>Dear ${name},</p>
+            <p>We have processed your request to unsubscribe from our mailing list. You will no longer receive emails from us at ${email} or phone calls on ${phone}.</p>
+            <p>Thank you for your time with us. If you have any feedback or questions, feel free to contact us at <a href="mailto:${process.env.CONTACT_SARACA_EMAIL}">${process.env.CONTACT_SARACA_EMAIL}</a>.</p>
+        </div>
+        <div class="footer">
+            <p>Best regards,</p>
+            <p>SARACA Solutions</p>
+        </div>
+    </div>
+</body>
+</html>
+`,
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            const error = new Error("Error sending mail");
+            error.status = 500;
+            return next(error);
+        }
+        res.status(200).json({
+            message: "You have unsubscribed successfully",
+        });
+    });
+});
+exports.unsubscribe = unsubscribe;
 const getDiscoverMore = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { object } = req.body;
     let { ids } = JSON.parse(object);
