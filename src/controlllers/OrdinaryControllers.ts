@@ -6,11 +6,11 @@ import nodemailer from "nodemailer";
 // import jwt from "jsonwebtoken";
 import path from "path";
 import fs from "fs";
-import dotenv from 'dotenv'
-dotenv.config()
+import dotenv from "dotenv";
+dotenv.config();
 
 const prisma = new PrismaClient({
-  log: ["query"]
+  log: ["query"],
 });
 
 const transporter = nodemailer.createTransport({
@@ -327,7 +327,9 @@ const createUser = asyncHandler(async (req, res, next) => {
   });
 
   // Generate an activation link (this is a placeholder, you'll need to implement this)
-  const activationLink = `${process.env.FRONTEND_SITE_URL.split(",")[0]}activate/${user.id}`;
+  const activationLink = `${
+    process.env.FRONTEND_SITE_URL.split(",")[0]
+  }activate/${user.id}`;
 
   // Send the activation email
   const mailOptions = {
@@ -462,8 +464,9 @@ const sendWhitePaper = asyncHandler(
             </style>
         </head>
         <body>
-            <p>Hello ${name} ${organisationName ? "(" + organisationName + ")" : ""
-        }</p>
+            <p>Hello ${name} ${
+        organisationName ? "(" + organisationName + ")" : ""
+      }</p>
             <p>Thanks for showing interest in our white paper. We appreciate the time you spent on our website. We hope you have liked our website. Please feel free to send any feedback you may have for us. Please find attached the white paper.</p>
             <p>Please feel free to reach out to us at <a href="mailto:contact@saracasolutions.com">contact@saracasolutions.com</a> for any questions you may have.</p>
             <p>Warm Regards,</p>
@@ -473,7 +476,11 @@ const sendWhitePaper = asyncHandler(
       attachments: [
         {
           filename: WhitePaper.title + ".pdf",
-          path: process.env.BACKEND_SITE_URL + WhitePaper?.pdf?.split("__")[0] + "__" + encodeURIComponent(WhitePaper?.pdf?.split("__")[1]),
+          path:
+            process.env.BACKEND_SITE_URL +
+            WhitePaper?.pdf?.split("__")[0] +
+            "__" +
+            encodeURIComponent(WhitePaper?.pdf?.split("__")[1]),
           contentType: "application/pdf", // Specify content type
           contentDisposition: "attachment", // Specify content disposition
         },
@@ -750,13 +757,13 @@ const getApplicationDetails = asyncHandler(
 
 const unsubscribe = asyncHandler(
   async (req: any, res: Response, next: NextFunction) => {
-  const {name, email, phone} = req.body
-  const mailOptions = {
-    from: `"SARACA Website" <${process.env.USER_EMAIL}>`,
-    to: email,
-    bcc: process.env.CONTACT_SARACA_EMAIL,
-    subject: "Unsubscribe Notification",
-    html: `<!DOCTYPE html>
+    const { name, email, phone } = req.body;
+    const mailOptions = {
+      from: `"SARACA Website" <${process.env.USER_EMAIL}>`,
+      to: email,
+      bcc: process.env.CONTACT_SARACA_EMAIL,
+      subject: "Unsubscribe Notification",
+      html: `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -820,55 +827,61 @@ const unsubscribe = asyncHandler(
 </body>
 </html>
 `,
-  };
- 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      const error: any = new Error("Error sending mail");
-      error.status = 500;
-      return next(error);
-    }
-    res.status(200).json({
-      message: "You have unsubscribed successfully",
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        const error: any = new Error("Error sending mail");
+        error.status = 500;
+        return next(error);
+      }
+      res.status(200).json({
+        message: "You have unsubscribed successfully",
+      });
     });
-  })
   }
 );
 
 const getDiscoverMore = asyncHandler(
   async (req: any, res: Response, next: NextFunction) => {
-    const { object } = req.body
-    let { ids } = JSON.parse(object)
-    const idsString = ids.map(id => `'${id}'`).join(',');
+    const { object } = req.body;
+    let { ids } = JSON.parse(object);
+    const idsString = ids.map((id) => `'${id}'`).join(",");
     
-    let data = []
-    const news: { id: string; img: string, link: string }[] = await prisma.$queryRaw`
-        SELECT id, img, link 
+    let data = [];
+    const news: { id: string; img: string; link: string }[] =
+      await prisma.$queryRawUnsafe(`
+        SELECT id, img, link, title 
         FROM "News" 
-        WHERE id in (${idsString})
-      `;
-    const blogs: { id: string; img: string, link: string }[] = await prisma.$queryRaw`
-    SELECT id, img, concat('/blog/', id) as link
+        WHERE id in (${idsString});
+      `);
+    const blogs: { id: string; img: string; link: string }[] =
+      await prisma.$queryRawUnsafe(`
+    SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}blog/', id) as link, title
     FROM "Blog" 
-    WHERE id in (${idsString})
-  `;
-    const webinars: { id: string; img: string, link: string }[] = await prisma.$queryRaw`
-   SELECT id, img, link 
+    WHERE id in (${idsString});
+  `);
+    const webinars: { id: string; img: string; link: string }[] =
+      await prisma.$queryRawUnsafe(`
+   SELECT id, img, link , title
    FROM "Webinar" 
-   WHERE id in (${idsString})
- `;
-    const whitePapers: { id: string; img: string, link: string }[] = await prisma.$queryRaw`
-   SELECT id, img, concat('/white_paper/', id) as link 
+   WHERE id in (${idsString});
+ `);
+    const whitePapers: { id: string; img: string; link: string }[] =
+      await prisma.$queryRawUnsafe(`
+   SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}white_paper/', id) as link, title 
    FROM "WhitePaper" 
-   WHERE id in (${idsString})
- `;
-    const caseStudies: { id: string; img: string, link: string }[] = await prisma.$queryRaw`
-   SELECT id, img, concat('/case_study/', id) as link
+   WHERE id in (${idsString});
+ `);
+    const caseStudies: { id: string; img: string; link: string }[] =
+      await prisma.$queryRawUnsafe(`
+   SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}case_study/', id) as link, title
    FROM "CaseStudy" 
-   WHERE id in (${idsString})
- `;
-    data = [...news, ...blogs, ...webinars, ...whitePapers, ...caseStudies]
-    res.status(200).json({ data: data })
+   WHERE id in (${idsString});
+ `);
+    
+    data = [...news, ...blogs, ...webinars, ...whitePapers, ...caseStudies];
+    res.status(200).json({ data: data });
   }
 );
 
@@ -902,5 +915,5 @@ export {
   getApplicationDetails,
   saveApplicationForm,
   getDiscoverMore,
-  unsubscribe
+  unsubscribe,
 };
