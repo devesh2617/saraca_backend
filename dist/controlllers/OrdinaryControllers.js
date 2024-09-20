@@ -15,6 +15,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const prisma = new client_1.PrismaClient({
     log: ["query"],
+    log: ["query"],
 });
 const transporter = nodemailer_1.default.createTransport({
     host: "smtp.office365.com",
@@ -289,6 +290,7 @@ const createUser = (0, express_async_handler_1.default)(async (req, res, next) =
     });
     // Generate an activation link (this is a placeholder, you'll need to implement this)
     const activationLink = `${process.env.FRONTEND_SITE_URL.split(",")[0]}activate/${user.id}`;
+    const activationLink = `${process.env.FRONTEND_SITE_URL.split(",")[0]}activate/${user.id}`;
     // Send the activation email
     const mailOptions = {
         from: `"SARACA Website" <${process.env.USER_EMAIL}>`,
@@ -406,6 +408,7 @@ const sendWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
             </style>
         </head>
         <body>
+            <p>Hello ${name} ${organisationName ? "(" + organisationName + ")" : ""}</p>
             <p>Hello ${name} ${organisationName ? "(" + organisationName + ")" : ""}</p>
             <p>Thanks for showing interest in our white paper. We appreciate the time you spent on our website. We hope you have liked our website. Please feel free to send any feedback you may have for us. Please find attached the white paper.</p>
             <p>Please feel free to reach out to us at <a href="mailto:contact@saracasolutions.com">contact@saracasolutions.com</a> for any questions you may have.</p>
@@ -655,113 +658,293 @@ const unsubscribe = (0, express_async_handler_1.default)(async (req, res, next) 
         bcc: process.env.CONTACT_SARACA_EMAIL,
         subject: "Unsubscribe Notification",
         html: `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unsubscribe Notification</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            background-color: #4CAF50;
-            color: #ffffff;
-            text-align: center;
-            padding: 10px 0;
-        }
-        .content {
-            margin: 20px 0;
-        }
-        .footer {
-            text-align: center;
-            color: #777777;
-            font-size: 12px;
-            margin-top: 20px;
-        }
-        .unsubscribe-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #ff0000;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Unsubscribe Notification</h1>
-        </div>
-        <div class="content">
-            <p>Dear ${name},</p>
-            <p>We have processed your request to unsubscribe from our mailing list. You will no longer receive emails from us at ${email} or phone calls on ${phone}.</p>
-            <p>Thank you for your time with us. If you have any feedback or questions, feel free to contact us at <a href="mailto:${process.env.CONTACT_SARACA_EMAIL}">${process.env.CONTACT_SARACA_EMAIL}</a>.</p>
-        </div>
-        <div class="footer">
-            <p>Best regards,</p>
-            <p>SARACA Solutions</p>
-        </div>
-    </div>
-</body>
-</html>
-`,
-    };
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            const error = new Error("Error sending mail");
-            error.status = 500;
-            return next(error);
-        }
-        res.status(200).json({
-            message: "You have unsubscribed successfully",
-        });
-    });
-});
+    const { name, email, phone } = req.body;
+    const mailOptions = {
+      from: `, "SARACA Website"() { process.env.USER_EMAIL; }
+    } > `,
+      to: email,
+      bcc: process.env.CONTACT_SARACA_EMAIL,
+      subject: "Unsubscribe Notification",
+      html: ` < !DOCTYPE, html;
+     >
+        lang;
+    "en" >
+        charset;
+    "UTF-8" >
+        name;
+    "viewport";
+    content = "width=device-width, initial-scale=1.0" >
+        Unsubscribe;
+    Notification < (/title>);
+    body;
+    {
+        font - family;
+        Arial, sans - serif;
+        background - color;
+        #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+})
+    .container, { width: , 100:  };
 exports.unsubscribe = unsubscribe;
-const getDiscoverMore = (0, express_async_handler_1.default)(async (req, res, next) => {
+ % ;
+max - width;
+600;
+px;
+margin: 0;
+auto;
+background - color;
+#ffffff;
+padding: 20;
+px;
+box - shadow;
+0;
+0;
+10;
+px;
+rgba(0, 0, 0, 0.1);
+header;
+{
+    background - color;
+    #;
+    4;
+    CAF50;
+    color: #ffffff;
+    text - align;
+    center;
+    padding: 10;
+    px;
+    0;
+}
+content;
+{
+    margin: 20;
+    px;
+    0;
+}
+footer;
+{
+    text - align;
+    center;
+    color: #;
+    777777;
+    font - size;
+    12;
+    px;
+    margin - top;
+    20;
+    px;
+}
+unsubscribe - button;
+{
+    display: inline - block;
+    padding: 10;
+    px;
+    20;
+    px;
+    background - color;
+    #ff0000;
+    color: #ffffff;
+    text - decoration;
+    none;
+    border - radius;
+    5;
+    px;
+}
+/style>
+    < /head>
+    < body >
+    class {
+    };
+"container" >
+    class {
+    };
+"header" >
+    Unsubscribe;
+Notification < /h1>
+    < /div>
+    < div;
+class {
+}
+"content" >
+    Dear;
+$;
+{
+    name;
+}
+/p>
+    < p > We;
+have;
+processed;
+your;
+request;
+to;
+unsubscribe;
+from;
+our;
+mailing;
+list.You;
+will;
+no;
+longer;
+receive;
+emails;
+from;
+us;
+at;
+$;
+{
+    email;
+}
+or;
+phone;
+calls;
+on;
+$;
+{
+    phone;
+}
+/p>
+    < p > Thank;
+you;
+for (your; time; )
+    with (us.If)
+        you;
+have;
+any;
+feedback;
+or;
+questions, feel;
+free;
+to;
+contact;
+us;
+at < a;
+href = "mailto:${process.env.CONTACT_SARACA_EMAIL}" > $;
+{
+    process.env.CONTACT_SARACA_EMAIL;
+}
+/a>.</p >
+    /div>
+    < div;
+class {
+}
+"footer" >
+    Best;
+regards, /p>
+    < p > SARACA;
+Solutions < /p>
+    < /div>
+    < /div>
+    < /body>
+    < /html> `,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        const error: any = new Error("Error sending mail");
+        error.status = 500;
+        return next(error);
+      }
+      res.status(200).json({
+        message: "You have unsubscribed successfully",
+      });
+    });
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        const error: any = new Error("Error sending mail");
+        error.status = 500;
+        return next(error);
+      }
+      res.status(200).json({
+        message: "You have unsubscribed successfully",
+      });
+    });
+  }
+);
+
+const getDiscoverMore = asyncHandler(
+  async (req: any, res: Response, next: NextFunction) => {
     const { object } = req.body;
     let { ids } = JSON.parse(object);
-    const idsString = ids.map((id) => `'${id}'`).join(",");
+    const idsString = ids.map((id) => `;
+'${id}' `).join(",");
+    
     let data = [];
-    const news = await prisma.$queryRawUnsafe(`
-        SELECT id, img, link, title, 'News' as type
-        FROM "News" 
-        WHERE id in (${idsString});
-      `);
-    const blogs = await prisma.$queryRawUnsafe(`
-    SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}blog/', id) as link, title, 'Blog' as type
-    FROM "Blog" 
-    WHERE id in (${idsString});
-  `);
-    const webinars = await prisma.$queryRawUnsafe(`
-   SELECT id, img, link , title, 'Webinar' as type
-   FROM "Webinar" 
-   WHERE id in (${idsString});
- `);
-    const whitePapers = await prisma.$queryRawUnsafe(`
-   SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}white_paper/', id) as link, title, 'White Paper' as type 
-   FROM "WhitePaper" 
-   WHERE id in (${idsString});
- `);
-    const caseStudies = await prisma.$queryRawUnsafe(`
-   SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}case_study/', id) as link, title, 'Case Study' as type
-   FROM "CaseStudy" 
-   WHERE id in (${idsString});
- `);
+    const news: { id: string; img: string; link: string }[] =
+      await prisma.$queryRawUnsafe(`;
+SELECT;
+id, img, link, title, 'News';
+FROM;
+"News";
+WHERE;
+id in ($);
+{
+    idsString;
+}
+;
+`);
+    const blogs: { id: string; img: string; link: string }[] =
+      await prisma.$queryRawUnsafe(`;
+SELECT;
+id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}blog/', id), title, 'Blog';
+FROM;
+"Blog";
+WHERE;
+id in ($);
+{
+    idsString;
+}
+;
+`);
+    const webinars: { id: string; img: string; link: string }[] =
+      await prisma.$queryRawUnsafe(`;
+SELECT;
+id, img, link, title, 'Webinar';
+FROM;
+"Webinar";
+WHERE;
+id in ($);
+{
+    idsString;
+}
+;
+`);
+    const whitePapers: { id: string; img: string; link: string }[] =
+      await prisma.$queryRawUnsafe(`;
+SELECT;
+id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}white_paper/', id), title, 'White Paper';
+FROM;
+"WhitePaper";
+WHERE;
+id in ($);
+{
+    idsString;
+}
+;
+`);
+    const caseStudies: { id: string; img: string; link: string }[] =
+      await prisma.$queryRawUnsafe(`;
+SELECT;
+id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}case_study/', id), title, 'Case Study';
+FROM;
+"CaseStudy";
+WHERE;
+id in ($);
+{
+    idsString;
+}
+;
+`);
+    
     data = [...news, ...blogs, ...webinars, ...whitePapers, ...caseStudies];
     res.status(200).json({ data: data });
-});
-exports.getDiscoverMore = getDiscoverMore;
+   WHERE id in (${idsString});
+ `;
+;
+data = [...news, ...blogs, ...webinars, ...whitePapers, ...caseStudies];
+res.status(200).json({ data: data });
+;

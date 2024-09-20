@@ -11,6 +11,7 @@ dotenv.config();
 
 const prisma = new PrismaClient({
   log: ["query"],
+  log: ["query"],
 });
 
 const transporter = nodemailer.createTransport({
@@ -330,6 +331,9 @@ const createUser = asyncHandler(async (req, res, next) => {
   const activationLink = `${
     process.env.FRONTEND_SITE_URL.split(",")[0]
   }activate/${user.id}`;
+  const activationLink = `${
+    process.env.FRONTEND_SITE_URL.split(",")[0]
+  }activate/${user.id}`;
 
   // Send the activation email
   const mailOptions = {
@@ -464,6 +468,9 @@ const sendWhitePaper = asyncHandler(
             </style>
         </head>
         <body>
+            <p>Hello ${name} ${
+        organisationName ? "(" + organisationName + ")" : ""
+      }</p>
             <p>Hello ${name} ${
         organisationName ? "(" + organisationName + ")" : ""
       }</p>
@@ -764,6 +771,13 @@ const unsubscribe = asyncHandler(
       bcc: process.env.CONTACT_SARACA_EMAIL,
       subject: "Unsubscribe Notification",
       html: `<!DOCTYPE html>
+    const { name, email, phone } = req.body;
+    const mailOptions = {
+      from: `"SARACA Website" <${process.env.USER_EMAIL}>`,
+      to: email,
+      bcc: process.env.CONTACT_SARACA_EMAIL,
+      subject: "Unsubscribe Notification",
+      html: `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -839,6 +853,18 @@ const unsubscribe = asyncHandler(
         message: "You have unsubscribed successfully",
       });
     });
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        const error: any = new Error("Error sending mail");
+        error.status = 500;
+        return next(error);
+      }
+      res.status(200).json({
+        message: "You have unsubscribed successfully",
+      });
+    });
   }
 );
 
@@ -877,6 +903,11 @@ const getDiscoverMore = asyncHandler(
       await prisma.$queryRawUnsafe(`
    SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}case_study/', id) as link, title, 'Case Study' as type
    FROM "CaseStudy" 
+   WHERE id in (${idsString});
+ `);
+    
+    data = [...news, ...blogs, ...webinars, ...whitePapers, ...caseStudies];
+    res.status(200).json({ data: data });
    WHERE id in (${idsString});
  `);
     
