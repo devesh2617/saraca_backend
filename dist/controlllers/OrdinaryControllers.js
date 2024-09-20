@@ -737,27 +737,27 @@ const getDiscoverMore = (0, express_async_handler_1.default)(async (req, res, ne
     const idsString = ids.map((id) => `'${id}'`).join(",");
     let data = [];
     const news = await prisma.$queryRawUnsafe(`
-        SELECT id, img, link, title 
+        SELECT id, img, link, title, 'News' as type 
         FROM "News" 
         WHERE id in (${idsString});
       `);
     const blogs = await prisma.$queryRawUnsafe(`
-    SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}blog/', id) as link, title
+    SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}blog/', id) as link, title, 'Blog' as type 
     FROM "Blog" 
     WHERE id in (${idsString});
   `);
     const webinars = await prisma.$queryRawUnsafe(`
-   SELECT id, img, link , title
+   SELECT id, img, link , title, 'Webinar' as type 
    FROM "Webinar" 
    WHERE id in (${idsString});
  `);
     const whitePapers = await prisma.$queryRawUnsafe(`
-   SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}white_paper/', id) as link, title 
+   SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}white_paper/', id) as link, title, 'White Paper' as type 
    FROM "WhitePaper" 
    WHERE id in (${idsString});
  `);
     const caseStudies = await prisma.$queryRawUnsafe(`
-   SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}case_study/', id) as link, title
+   SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}case_study/', id) as link, title, 'Case Study' as type 
    FROM "CaseStudy" 
    WHERE id in (${idsString});
  `);
