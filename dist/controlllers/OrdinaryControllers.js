@@ -14,7 +14,7 @@ const fs_1 = __importDefault(require("fs"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const prisma = new client_1.PrismaClient({
-    log: ["query"]
+    log: ["query"],
 });
 const transporter = nodemailer_1.default.createTransport({
     host: "smtp.office365.com",
@@ -416,7 +416,10 @@ const sendWhitePaper = (0, express_async_handler_1.default)(async (req, res, nex
         attachments: [
             {
                 filename: WhitePaper.title + ".pdf",
-                path: process.env.BACKEND_SITE_URL + WhitePaper?.pdf?.split("__")[0] + "__" + encodeURIComponent(WhitePaper?.pdf?.split("__")[1]),
+                path: process.env.BACKEND_SITE_URL +
+                    WhitePaper?.pdf?.split("__")[0] +
+                    "__" +
+                    encodeURIComponent(WhitePaper?.pdf?.split("__")[1]),
                 contentType: "application/pdf", // Specify content type
                 contentDisposition: "attachment", // Specify content disposition
             },
@@ -731,33 +734,33 @@ exports.unsubscribe = unsubscribe;
 const getDiscoverMore = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { object } = req.body;
     let { ids } = JSON.parse(object);
-    const idsString = ids.map(id => `'${id}'`).join(',');
+    const idsString = ids.map((id) => `'${id}'`).join(",");
     let data = [];
-    const news = await prisma.$queryRaw `
-        SELECT id, img, link 
+    const news = await prisma.$queryRawUnsafe(`
+        SELECT id, img, link, title 
         FROM "News" 
-        WHERE id in (${idsString})
-      `;
-    const blogs = await prisma.$queryRaw `
-    SELECT id, img, concat('/blog/', id) as link
+        WHERE id in (${idsString});
+      `);
+    const blogs = await prisma.$queryRawUnsafe(`
+    SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}blog/', id) as link, title
     FROM "Blog" 
-    WHERE id in (${idsString})
-  `;
-    const webinars = await prisma.$queryRaw `
-   SELECT id, img, link 
+    WHERE id in (${idsString});
+  `);
+    const webinars = await prisma.$queryRawUnsafe(`
+   SELECT id, img, link , title
    FROM "Webinar" 
-   WHERE id in (${idsString})
- `;
-    const whitePapers = await prisma.$queryRaw `
-   SELECT id, img, concat('/white_paper/', id) as link 
+   WHERE id in (${idsString});
+ `);
+    const whitePapers = await prisma.$queryRawUnsafe(`
+   SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}white_paper/', id) as link, title 
    FROM "WhitePaper" 
-   WHERE id in (${idsString})
- `;
-    const caseStudies = await prisma.$queryRaw `
-   SELECT id, img, concat('/case_study/', id) as link
+   WHERE id in (${idsString});
+ `);
+    const caseStudies = await prisma.$queryRawUnsafe(`
+   SELECT id, img, concat('${process.env.FRONTEND_SITE_URL.split(",")[0]}case_study/', id) as link, title
    FROM "CaseStudy" 
-   WHERE id in (${idsString})
- `;
+   WHERE id in (${idsString});
+ `);
     data = [...news, ...blogs, ...webinars, ...whitePapers, ...caseStudies];
     res.status(200).json({ data: data });
 });
