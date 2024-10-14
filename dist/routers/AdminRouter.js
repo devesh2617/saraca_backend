@@ -21,4 +21,5 @@ Router.get('/delete_case_study/:id', AdminControllers_1.deleteCaseStudy);
 Router.get('/delete_news/:id', AdminControllers_1.deleteNews);
 Router.get('/delete_blog/:id', AdminControllers_1.deleteBlog);
 Router.get('/delete_webinar/:id', AdminControllers_1.deleteWebinar);
+Router.post('/create_event', AdminControllers_1.addEvent);
 exports.default = Router;
