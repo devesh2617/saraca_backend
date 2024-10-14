@@ -148,3 +148,15 @@ model UserDetails {
 
   @@unique([positionId, userId])
 }
+
+model Events{
+id String @id @default(uuid())
+name String
+from_date DateTime
+to_date DateTime?
+images String[]
+description String
+location String
+created_at DateTime @default(now())
+updated_at DateTime @updatedAt
+}
