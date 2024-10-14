@@ -640,4 +640,48 @@ const editCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFun
     }
 });
 
-export { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper, editBlog, editWebinar, editNews, editCaseStudy, deleteWhitePaper, deleteBlog, deleteWebinar, deleteNews, deleteCaseStudy }
+const addEvent = asyncHandler(
+    async (req: any, res: Response, next: NextFunction) => {
+      const { name, from_date, to_date, description, location } = req.body;
+      const images = req.files?.images;
+  
+      try {
+        // Copy images and get saved filenames
+        const savedImages = await Promise.all(
+          images.map(async (image: any) => {
+            const filename = Date.now() + "__" + image.name;
+            const filepath = path.join(__dirname, `../../public/images/events/${filename}`);
+            
+            // Copy the file asynchronously
+            await fs.promises.copyFile(image.path, filepath);
+  
+            // Return the filename to store in the database
+            return `/images/events/${filename}`;
+          })
+        );
+  
+        // Save event to the database
+        await prisma.events.create({
+          data: {
+            name,
+            from_date,
+            to_date,
+            images: savedImages, // Store image filenames
+            description,
+            location
+          }
+        });
+  
+        res.status(201).json({
+          message: "Event created successfully!",
+        });
+      } catch (error) {
+        // Handle any error that occurs during the process
+        console.error('Error creating event:', error);
+        next(new Error('Error creating event: ' + error.message));
+      }
+    }
+  );
+  
+
+export { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper, editBlog, editWebinar, editNews, editCaseStudy, deleteWhitePaper, deleteBlog, deleteWebinar, deleteNews, deleteCaseStudy, addEvent }

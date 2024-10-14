@@ -1,5 +1,5 @@
 import express from 'express'
-import { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper, editCaseStudy, editNews, editBlog, editWebinar, deleteWhitePaper, deleteCaseStudy, deleteNews, deleteBlog, deleteWebinar } from '../controlllers/AdminControllers'
+import { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper, editCaseStudy, editNews, editBlog, editWebinar, deleteWhitePaper, deleteCaseStudy, deleteNews, deleteBlog, deleteWebinar, addEvent } from '../controlllers/AdminControllers'
 
 const Router = express.Router();
 
@@ -18,4 +18,6 @@ Router.get('/delete_case_study/:id', deleteCaseStudy);
 Router.get('/delete_news/:id', deleteNews);
 Router.get('/delete_blog/:id', deleteBlog);
 Router.get('/delete_webinar/:id', deleteWebinar);
+Router.post('/create_event', addEvent);
+
 export default Router;
