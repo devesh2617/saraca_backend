@@ -669,7 +669,7 @@ const addEvent = asyncHandler(
           data: {
             name,
             from_date: new Date(from_date),
-            to_date:new Date(to_date),
+            to_date: to_date==="undefined"?null:new Date(to_date),
             images: savedImages, // Store image filenames
             description,
             location

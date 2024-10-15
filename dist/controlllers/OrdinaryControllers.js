@@ -768,17 +768,17 @@ exports.getDiscoverMore = getDiscoverMore;
 const getUpcomingEvents = (0, express_async_handler_1.default)(async (_, res, next) => {
     const events = await prisma.$queryRawUnsafe(`
         SELECT * 
-        FROM "Events" 
-        WHERE from_date > now();
+      FROM "Events" 
+      WHERE COALESCE(to_date, from_date) > now();
       `);
     res.status(200).json({ data: events });
 });
 exports.getUpcomingEvents = getUpcomingEvents;
 const getPastEvents = (0, express_async_handler_1.default)(async (_, res, next) => {
     const events = await prisma.$queryRawUnsafe(`
-        SELECT * 
-        FROM "Events" 
-        WHERE to_date < now();
+      SELECT * 
+      FROM "Events" 
+      WHERE COALESCE(to_date, from_date) < now();
       `);
     res.status(200).json({ data: events });
 });
