@@ -145,8 +145,9 @@ const addWebinar = asyncHandler(async (req: any, res: Response, next: NextFuncti
         error.status = 409
         return next(error)
     }
-
+    
     const file = req.files.img;
+    console.log(file, file.name)
     const filename = Date.now() + "__" + file.name;
     const filepath = path.join(__dirname, `../../public/images/webinars/${filename}`)
 
@@ -644,11 +645,11 @@ const addEvent = asyncHandler(
     async (req: any, res: Response, next: NextFunction) => {
       const { name, from_date, to_date, description, location } = req.body;
       const images = req.files?.images;
-  
       try {
         // Copy images and get saved filenames
         const savedImages = await Promise.all(
           images.map(async (image: any) => {
+            console.log(image)
             const filename = Date.now() + "__" + image.name;
             const filepath = path.join(__dirname, `../../public/images/events/${filename}`);
             
@@ -659,13 +660,16 @@ const addEvent = asyncHandler(
             return `/images/events/${filename}`;
           })
         );
-  
+        // from_date = new Date(from_date)
+        // to_date = new Date(to_date)
+        // const offsetInHours = 5.5; // For example, 5 hours and 30 minutes for IST
+        // const offsetInMilliseconds = offsetInHours * 60 * 60 * 1000; // Convert to milliseconds
         // Save event to the database
         await prisma.events.create({
           data: {
             name,
-            from_date,
-            to_date,
+            from_date: new Date(from_date),
+            to_date:new Date(to_date),
             images: savedImages, // Store image filenames
             description,
             location

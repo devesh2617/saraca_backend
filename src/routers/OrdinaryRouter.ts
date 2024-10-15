@@ -1,5 +1,5 @@
 import express from 'express'
-import { getWhitePapers, getNews, getWebinars, getBlogs, getCaseStudies, getRegions, getPositions,  getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId, getRegionbyId, getPositionsbyRegion, createUser, check_login, verify_email, getWhitePapersbyIndustry, getCaseStudiesbyIndustry, sendWhitePaper, searchFeature, saveMyInfo,saveEducation, saveExperience, saveAgreement, getApplicationDetails, saveApplicationForm, getDiscoverMore, unsubscribe } from '../controlllers/OrdinaryControllers'
+import { getWhitePapers, getNews, getWebinars, getBlogs, getCaseStudies, getRegions, getPositions,  getPositionbyId, getWhitePaperbyId, getNewsbyId, getBlogbyId, getCaseStudybyId, getWebinarbyId, getRegionbyId, getPositionsbyRegion, createUser, check_login, verify_email, getWhitePapersbyIndustry, getCaseStudiesbyIndustry, sendWhitePaper, searchFeature, saveMyInfo,saveEducation, saveExperience, saveAgreement, getApplicationDetails, saveApplicationForm, getDiscoverMore, unsubscribe, getUpcomingEvents, getPastEvents } from '../controlllers/OrdinaryControllers'
 
 const Router = express.Router();
 
@@ -33,5 +33,6 @@ Router.post('/career/get_my_application_details', getApplicationDetails);
 Router.post('/career/save_application_form', saveApplicationForm);
 Router.post('/get_discover_more_by_ids', getDiscoverMore);
 Router.post('/unsubscribe', unsubscribe);
-
+Router.get('/upcoming_events', getUpcomingEvents);
+Router.get('/past_events', getPastEvents);
 export default Router

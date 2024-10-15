@@ -40,7 +40,6 @@ app.use(expressFormData.parse({
   autoClean: true // Automatically clean uploaded files
 }))
 app.use(expressFormData.union())
-
 app.use(cors(corsOptions))
 app.use(express.static(path.join(__dirname, '../public')))
 app.listen(PORT, () => {

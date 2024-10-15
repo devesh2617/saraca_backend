@@ -885,6 +885,28 @@ const getDiscoverMore = asyncHandler(
   }
 );
 
+const getUpcomingEvents = asyncHandler(
+  async ( _ , res: Response, next: NextFunction) => {
+    const events = await prisma.$queryRawUnsafe(`
+        SELECT * 
+        FROM "Events" 
+        WHERE from_date > now();
+      `);
+    res.status(200).json({ data: events });
+  }
+);
+
+const getPastEvents = asyncHandler(
+  async ( _ , res: Response, next: NextFunction) => {
+    const events = await prisma.$queryRawUnsafe(`
+        SELECT * 
+        FROM "Events" 
+        WHERE to_date < now();
+      `);
+    res.status(200).json({ data: events });
+  }
+);
+
 export {
   getWhitePapers,
   getBlogs,
@@ -916,4 +938,6 @@ export {
   saveApplicationForm,
   getDiscoverMore,
   unsubscribe,
+  getUpcomingEvents,
+  getPastEvents
 };

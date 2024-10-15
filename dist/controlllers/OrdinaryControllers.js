@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unsubscribe = exports.getDiscoverMore = exports.saveApplicationForm = exports.getApplicationDetails = exports.saveAgreement = exports.saveExperience = exports.saveEducation = exports.saveMyInfo = exports.searchFeature = exports.sendWhitePaper = exports.getWhitePapersbyIndustry = exports.getCaseStudiesbyIndustry = exports.verify_email = exports.check_login = exports.createUser = exports.getPositionsbyRegion = exports.getRegionbyId = exports.getWebinarbyId = exports.getCaseStudybyId = exports.getBlogbyId = exports.getNewsbyId = exports.getWhitePaperbyId = exports.getPositionbyId = exports.getPositions = exports.getRegions = exports.getCaseStudies = exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = void 0;
+exports.getPastEvents = exports.getUpcomingEvents = exports.unsubscribe = exports.getDiscoverMore = exports.saveApplicationForm = exports.getApplicationDetails = exports.saveAgreement = exports.saveExperience = exports.saveEducation = exports.saveMyInfo = exports.searchFeature = exports.sendWhitePaper = exports.getWhitePapersbyIndustry = exports.getCaseStudiesbyIndustry = exports.verify_email = exports.check_login = exports.createUser = exports.getPositionsbyRegion = exports.getRegionbyId = exports.getWebinarbyId = exports.getCaseStudybyId = exports.getBlogbyId = exports.getNewsbyId = exports.getWhitePaperbyId = exports.getPositionbyId = exports.getPositions = exports.getRegions = exports.getCaseStudies = exports.getWebinars = exports.getNews = exports.getBlogs = exports.getWhitePapers = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -765,3 +765,21 @@ const getDiscoverMore = (0, express_async_handler_1.default)(async (req, res, ne
     res.status(200).json({ data: data });
 });
 exports.getDiscoverMore = getDiscoverMore;
+const getUpcomingEvents = (0, express_async_handler_1.default)(async (_, res, next) => {
+    const events = await prisma.$queryRawUnsafe(`
+        SELECT * 
+        FROM "Events" 
+        WHERE from_date > now();
+      `);
+    res.status(200).json({ data: events });
+});
+exports.getUpcomingEvents = getUpcomingEvents;
+const getPastEvents = (0, express_async_handler_1.default)(async (_, res, next) => {
+    const events = await prisma.$queryRawUnsafe(`
+        SELECT * 
+        FROM "Events" 
+        WHERE to_date < now();
+      `);
+    res.status(200).json({ data: events });
+});
+exports.getPastEvents = getPastEvents;

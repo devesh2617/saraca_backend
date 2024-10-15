@@ -36,4 +36,6 @@ Router.post('/career/get_my_application_details', OrdinaryControllers_1.getAppli
 Router.post('/career/save_application_form', OrdinaryControllers_1.saveApplicationForm);
 Router.post('/get_discover_more_by_ids', OrdinaryControllers_1.getDiscoverMore);
 Router.post('/unsubscribe', OrdinaryControllers_1.unsubscribe);
+Router.get('/upcoming_events', OrdinaryControllers_1.getUpcomingEvents);
+Router.get('/past_events', OrdinaryControllers_1.getPastEvents);
 exports.default = Router;
