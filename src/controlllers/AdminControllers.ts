@@ -644,15 +644,20 @@ const editCaseStudy = asyncHandler(async (req: any, res: Response, next: NextFun
 const addEvent = asyncHandler(
     async (req: any, res: Response, next: NextFunction) => {
       const { name, from_date, to_date, description, location } = req.body;
-      const images = req.files?.images;
+      let images = req.files?.images;
+  
+      // Normalize images to an array if it's a single file
+      if (images && !Array.isArray(images)) {
+        images = [images];
+      }
+  
       try {
         // Copy images and get saved filenames
         const savedImages = await Promise.all(
           images.map(async (image: any) => {
-            console.log(image)
             const filename = Date.now() + "__" + image.name;
             const filepath = path.join(__dirname, `../../public/images/events/${filename}`);
-            
+  
             // Copy the file asynchronously
             await fs.promises.copyFile(image.path, filepath);
   
@@ -660,20 +665,17 @@ const addEvent = asyncHandler(
             return `/images/events/${filename}`;
           })
         );
-        // from_date = new Date(from_date)
-        // to_date = new Date(to_date)
-        // const offsetInHours = 5.5; // For example, 5 hours and 30 minutes for IST
-        // const offsetInMilliseconds = offsetInHours * 60 * 60 * 1000; // Convert to milliseconds
+  
         // Save event to the database
         await prisma.events.create({
           data: {
             name,
             from_date: new Date(from_date),
-            to_date: to_date==="undefined"?null:new Date(to_date),
+            to_date: to_date === "undefined" ? null : new Date(to_date),
             images: savedImages, // Store image filenames
             description,
-            location
-          }
+            location,
+          },
         });
   
         res.status(201).json({
@@ -686,6 +688,5 @@ const addEvent = asyncHandler(
       }
     }
   );
-  
 
 export { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper, editBlog, editWebinar, editNews, editCaseStudy, deleteWhitePaper, deleteBlog, deleteWebinar, deleteNews, deleteCaseStudy, addEvent }

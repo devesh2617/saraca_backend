@@ -568,11 +568,14 @@ const editCaseStudy = (0, express_async_handler_1.default)(async (req, res, next
 exports.editCaseStudy = editCaseStudy;
 const addEvent = (0, express_async_handler_1.default)(async (req, res, next) => {
     const { name, from_date, to_date, description, location } = req.body;
-    const images = req.files?.images;
+    let images = req.files?.images;
+    // Normalize images to an array if it's a single file
+    if (images && !Array.isArray(images)) {
+        images = [images];
+    }
     try {
         // Copy images and get saved filenames
         const savedImages = await Promise.all(images.map(async (image) => {
-            console.log(image);
             const filename = Date.now() + "__" + image.name;
             const filepath = path_1.default.join(__dirname, `../../public/images/events/${filename}`);
             // Copy the file asynchronously
@@ -580,10 +583,6 @@ const addEvent = (0, express_async_handler_1.default)(async (req, res, next) => 
             // Return the filename to store in the database
             return `/images/events/${filename}`;
         }));
-        // from_date = new Date(from_date)
-        // to_date = new Date(to_date)
-        // const offsetInHours = 5.5; // For example, 5 hours and 30 minutes for IST
-        // const offsetInMilliseconds = offsetInHours * 60 * 60 * 1000; // Convert to milliseconds
         // Save event to the database
         await prisma.events.create({
             data: {
@@ -592,8 +591,8 @@ const addEvent = (0, express_async_handler_1.default)(async (req, res, next) => 
                 to_date: to_date === "undefined" ? null : new Date(to_date),
                 images: savedImages, // Store image filenames
                 description,
-                location
-            }
+                location,
+            },
         });
         res.status(201).json({
             message: "Event created successfully!",

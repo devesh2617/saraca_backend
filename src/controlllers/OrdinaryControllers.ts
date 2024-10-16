@@ -890,7 +890,8 @@ const getUpcomingEvents = asyncHandler(
     const events = await prisma.$queryRawUnsafe(`
         SELECT * 
       FROM "Events" 
-      WHERE COALESCE(to_date, from_date) > now();
+      WHERE COALESCE(to_date, from_date) > now()
+      ORDER BY from_date ASC;
       `);
     res.status(200).json({ data: events });
   }
@@ -901,7 +902,8 @@ const getPastEvents = asyncHandler(
     const events = await prisma.$queryRawUnsafe(`
       SELECT * 
       FROM "Events" 
-      WHERE COALESCE(to_date, from_date) < now();
+      WHERE COALESCE(to_date, from_date) < now()
+      ORDER BY from_date ASC;
       `);
     res.status(200).json({ data: events });
   }
