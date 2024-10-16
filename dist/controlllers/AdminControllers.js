@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editEvent = exports.addEvent = exports.deleteCaseStudy = exports.deleteNews = exports.deleteWebinar = exports.deleteBlog = exports.deleteWhitePaper = exports.editCaseStudy = exports.editNews = exports.editWebinar = exports.editBlog = exports.editWhitePaper = exports.addCaseStudy = exports.addBlog = exports.addWebinar = exports.addNews = exports.addWhitePaper = void 0;
+exports.deleteEventById = exports.editEvent = exports.addEvent = exports.deleteCaseStudy = exports.deleteNews = exports.deleteWebinar = exports.deleteBlog = exports.deleteWhitePaper = exports.editCaseStudy = exports.editNews = exports.editWebinar = exports.editBlog = exports.editWhitePaper = exports.addCaseStudy = exports.addBlog = exports.addWebinar = exports.addNews = exports.addWhitePaper = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const fs_1 = __importDefault(require("fs"));
@@ -665,3 +665,33 @@ const editEvent = (0, express_async_handler_1.default)(async (req, res, next) =>
     }
 });
 exports.editEvent = editEvent;
+const deleteEventById = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { id } = req.params; // Get the UUID from the URL parameters
+    try {
+        // Find the event in the database to get the image file paths
+        const existingEvent = await prisma.events.findUnique({
+            where: { id }, // UUIDs are stored as strings, so no need to convert to a number
+        });
+        if (!existingEvent) {
+            res.status(404).json({ message: 'Event not found' });
+            return;
+        }
+        // Delete the associated images from the server
+        await Promise.all(existingEvent.images.map(async (imagePath) => {
+            const fullPath = path_1.default.join(__dirname, `../../public${imagePath}`);
+            if (fs_1.default.existsSync(fullPath)) {
+                await fs_1.default.promises.unlink(fullPath); // Asynchronously delete the image file
+            }
+        }));
+        // Delete the event from the database
+        await prisma.events.delete({
+            where: { id },
+        });
+        res.status(200).json({ message: 'Event deleted successfully!' });
+    }
+    catch (error) {
+        console.error('Error deleting event:', error);
+        next(new Error('Error deleting event: ' + error.message));
+    }
+});
+exports.deleteEventById = deleteEventById;

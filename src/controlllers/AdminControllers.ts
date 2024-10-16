@@ -762,4 +762,42 @@ const addEvent = asyncHandler(
     }
   );
 
-export { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper, editBlog, editWebinar, editNews, editCaseStudy, deleteWhitePaper, deleteBlog, deleteWebinar, deleteNews, deleteCaseStudy, addEvent, editEvent }
+  const deleteEventById = asyncHandler(
+    async (req: any, res: Response, next: NextFunction) => {
+      const { id } = req.params; // Get the UUID from the URL parameters
+  
+      try {
+        // Find the event in the database to get the image file paths
+        const existingEvent = await prisma.events.findUnique({
+          where: { id }, // UUIDs are stored as strings, so no need to convert to a number
+        });
+  
+        if (!existingEvent) {
+           res.status(404).json({ message: 'Event not found' });
+           return;
+        }
+  
+        // Delete the associated images from the server
+        await Promise.all(
+          existingEvent.images.map(async (imagePath: string) => {
+            const fullPath = path.join(__dirname, `../../public${imagePath}`);
+            if (fs.existsSync(fullPath)) {
+              await fs.promises.unlink(fullPath); // Asynchronously delete the image file
+            }
+          })
+        );
+  
+        // Delete the event from the database
+        await prisma.events.delete({
+          where: { id },
+        });
+  
+        res.status(200).json({ message: 'Event deleted successfully!' });
+      } catch (error: any) {
+        console.error('Error deleting event:', error);
+        next(new Error('Error deleting event: ' + error.message));
+      }
+    }
+  );
+
+export { addWhitePaper, addNews, addWebinar, addBlog, addCaseStudy, editWhitePaper, editBlog, editWebinar, editNews, editCaseStudy, deleteWhitePaper, deleteBlog, deleteWebinar, deleteNews, deleteCaseStudy, addEvent, editEvent, deleteEventById }

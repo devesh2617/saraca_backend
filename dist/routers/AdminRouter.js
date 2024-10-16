@@ -23,4 +23,5 @@ Router.get('/delete_blog/:id', AdminControllers_1.deleteBlog);
 Router.get('/delete_webinar/:id', AdminControllers_1.deleteWebinar);
 Router.post('/create_event', AdminControllers_1.addEvent);
 Router.post('/edit_event/:id', AdminControllers_1.editEvent);
+Router.post('/delete_event/:id', AdminControllers_1.deleteEventById);
 exports.default = Router;
