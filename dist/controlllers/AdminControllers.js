@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addEvent = exports.deleteCaseStudy = exports.deleteNews = exports.deleteWebinar = exports.deleteBlog = exports.deleteWhitePaper = exports.editCaseStudy = exports.editNews = exports.editWebinar = exports.editBlog = exports.editWhitePaper = exports.addCaseStudy = exports.addBlog = exports.addWebinar = exports.addNews = exports.addWhitePaper = void 0;
+exports.editEvent = exports.addEvent = exports.deleteCaseStudy = exports.deleteNews = exports.deleteWebinar = exports.deleteBlog = exports.deleteWhitePaper = exports.editCaseStudy = exports.editNews = exports.editWebinar = exports.editBlog = exports.editWhitePaper = exports.addCaseStudy = exports.addBlog = exports.addWebinar = exports.addNews = exports.addWhitePaper = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const client_1 = require("@prisma/client");
 const fs_1 = __importDefault(require("fs"));
@@ -605,3 +605,63 @@ const addEvent = (0, express_async_handler_1.default)(async (req, res, next) => 
     }
 });
 exports.addEvent = addEvent;
+const editEvent = (0, express_async_handler_1.default)(async (req, res, next) => {
+    const { id } = req.params; // Get the event ID from the request parameters
+    const { name, from_date, to_date, description, location } = req.body;
+    let images = req.files?.images;
+    // Normalize images to an array if it's a single file
+    if (images && !Array.isArray(images)) {
+        images = [images];
+    }
+    try {
+        // Retrieve the existing event to update
+        const existingEvent = await prisma.events.findUnique({
+            where: { id },
+        });
+        if (!existingEvent) {
+            res.status(404).json({ message: 'Event not found' });
+            return;
+        }
+        // Variable to store the final list of images
+        let savedImages = existingEvent.images || []; // Start with existing images if no new ones are uploaded
+        // If new images are provided, delete the old images and save the new ones
+        if (images) {
+            // Delete old images from the server
+            for (const imagePath of existingEvent.images) {
+                const fullPath = path_1.default.join(__dirname, `../../public${imagePath}`);
+                if (fs_1.default.existsSync(fullPath)) {
+                    fs_1.default.unlinkSync(fullPath); // Synchronously delete the image file
+                }
+            }
+            // Save the new images to the server
+            savedImages = await Promise.all(images.map(async (image) => {
+                const filename = Date.now() + "__" + image.name;
+                const filepath = path_1.default.join(__dirname, `../../public/images/events/${filename}`);
+                // Copy the file asynchronously
+                await fs_1.default.promises.copyFile(image.path, filepath);
+                // Return the filename to store in the database
+                return `/images/events/${filename}`;
+            }));
+        }
+        // Update the event in the database
+        await prisma.events.update({
+            where: { id: id },
+            data: {
+                name,
+                from_date: new Date(from_date),
+                to_date: to_date === "undefined" ? null : new Date(to_date),
+                images: savedImages, // Update image filenames if there are new ones
+                description,
+                location,
+            },
+        });
+        res.status(200).json({
+            message: 'Event updated successfully!',
+        });
+    }
+    catch (error) {
+        // Handle any error that occurs during the process
+        next(new Error('Error updating event: ' + error.message));
+    }
+});
+exports.editEvent = editEvent;

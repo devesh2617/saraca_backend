@@ -38,4 +38,6 @@ Router.post('/get_discover_more_by_ids', OrdinaryControllers_1.getDiscoverMore);
 Router.post('/unsubscribe', OrdinaryControllers_1.unsubscribe);
 Router.get('/upcoming_events', OrdinaryControllers_1.getUpcomingEvents);
 Router.get('/past_events', OrdinaryControllers_1.getPastEvents);
+Router.get('/get_event/:id', OrdinaryControllers_1.getEventbyId);
+Router.get('/get_all_events', OrdinaryControllers_1.getAllEvents);
 exports.default = Router;

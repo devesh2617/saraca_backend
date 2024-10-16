@@ -898,7 +898,7 @@ const getUpcomingEvents = asyncHandler(
 );
 
 const getPastEvents = asyncHandler(
-  async ( _ , res: Response, next: NextFunction) => {
+  async ( _ , res: Response) => {
     const events = await prisma.$queryRawUnsafe(`
       SELECT * 
       FROM "Events" 
@@ -906,6 +906,31 @@ const getPastEvents = asyncHandler(
       ORDER BY from_date ASC;
       `);
     res.status(200).json({ data: events });
+  }
+);
+
+const getAllEvents = asyncHandler(
+  async ( _ , res: Response) => {
+    const events = await prisma.events.findMany({orderBy:{from_date:"asc"}})
+    res.status(200).json({ data: events });
+  }
+);
+
+const getEventbyId = asyncHandler(
+  async (req: any, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const event = await prisma.events.findFirst({
+      where: { id },
+    });
+    if (!event) {
+      const error: any = new Error("Event don't exist");
+      error.status = 404;
+      return next(error);
+    }
+    res.status(200).json({
+      message: "Event fetched successfully",
+      event: event,
+    });
   }
 );
 
@@ -941,5 +966,7 @@ export {
   getDiscoverMore,
   unsubscribe,
   getUpcomingEvents,
-  getPastEvents
+  getPastEvents,
+  getEventbyId,
+  getAllEvents
 };
